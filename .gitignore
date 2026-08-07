@@ -1,0 +1,33 @@
+# Root gitignore for MohollaConnect
+
+# Zip archives
+*.zip
+
+# Temp extraction folders
+temp_zip_extract/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+build/
+
+# Gradle
+.gradle/
+backend/build/
+backend/bin/
+
+# Environment files (keep .env.example, ignore .env)
+frontend/.env
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
