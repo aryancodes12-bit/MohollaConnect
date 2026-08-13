@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  --color-indigo: #1B1F3B;
+  --color-clay: #D96B43;
+  --color-ivory: #FBF8F3;
+  --color-marigold: #E6A100;
+  --color-neem: #2B580C;
+  --color-saffron: #E05A47;
+  --color-warmwhite: #FAF6F0;
+  --color-deepdark: #121420;
+
+  --font-display: 'Rozha One', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-indic: 'Noto Sans Devanagari', sans-serif;
+
+  --shadow-warm: 0 8px 30px rgba(217, 107, 67, 0.12);
+  --shadow-warm-lg: 0 12px 40px rgba(217, 107, 67, 0.18);
+  --shadow-indigo: 0 12px 40px rgba(27, 31, 59, 0.25);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-indigo);
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* Jali Lattice Mask Background */
+.jali-bg {
+  background-image: url('/jali-pattern.svg');
+  background-repeat: repeat;
+}
+
+.jali-overlay {
+  position: relative;
+}
+
+.jali-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/jali-pattern.svg');
+  background-repeat: repeat;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Metallic Foil Stamp Border Accent */
+.foil-border {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--color-warmwhite), var(--color-warmwhite)) padding-box,
+              linear-gradient(135deg, #E6A100 0%, #D96B43 50%, #E6A100 100%) border-box;
+}
+
+.foil-border-indigo {
+  border: 1px solid transparent;
+  background: linear-gradient(#1B1F3B, #1B1F3B) padding-box,
+              linear-gradient(135deg, #E6A100 0%, #D96B43 50%, #E6A100 100%) border-box;
+}
+
+/* Indigo Glassmorphism for OTP / Security Calmer screens */
+.glass-indigo {
+  background: rgba(27, 31, 59, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(230, 161, 0, 0.2);
+  box-shadow: var(--shadow-indigo);
+}
+
+.glass-clay {
+  background: rgba(251, 248, 243, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(217, 107, 67, 0.15);
+  box-shadow: var(--shadow-warm);
+}
+
+/* Badges */
+.badge-buyer {
+  background-color: rgba(217, 107, 67, 0.1);
+  color: #D96B43;
+  border: 1px solid rgba(217, 107, 67, 0.25);
+}
+
+.badge-seller {
+  background-color: rgba(43, 88, 12, 0.1);
+  color: #2B580C;
+  border: 1px solid rgba(43, 88, 12, 0.25);
+}
+
+.badge-pending {
+  background-color: rgba(230, 161, 0, 0.1);
+  color: #B37D00;
+  border: 1px solid rgba(230, 161, 0, 0.3);
+}
+
+.badge-admin {
+  background-color: rgba(224, 90, 71, 0.1);
+  color: #E05A47;
+  border: 1px solid rgba(224, 90, 71, 0.3);
+}
