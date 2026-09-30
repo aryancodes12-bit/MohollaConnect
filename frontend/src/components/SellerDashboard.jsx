@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Package, Store, RefreshCw } from 'lucide-react';
+import { LogOut, Package, Store, RefreshCw, TrendingUp } from 'lucide-react';
 import api from '../services/api';
 import { sendOtpEmail } from '../services/emailService';
 import { useAuth } from '../context/AuthContext';
@@ -144,6 +144,13 @@ const SellerDashboard = ({ storeId }) => {
             className="px-3.5 py-2 rounded-xl bg-warmwhite hover:bg-white text-indigo border border-clay/20 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
           >
             <Store className="w-3.5 h-3.5 text-clay" /> Store Profile
+          </Link>
+
+          <Link
+            to="/dashboard/analytics"
+            className="px-3.5 py-2 rounded-xl bg-clay text-warmwhite hover:bg-clay/90 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> Analytics
           </Link>
 
           <button
