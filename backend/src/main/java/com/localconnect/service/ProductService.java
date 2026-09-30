@@ -119,6 +119,8 @@ public class ProductService {
                 .storeStatus(product.getStore().getStatus())
                 .storeLocation(product.getStore().getLocation())
                 .storeCategory(product.getStore().getCategory())
+                .storeLatitude(product.getStore().getLatitude())
+                .storeLongitude(product.getStore().getLongitude())
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .price(product.getPrice())

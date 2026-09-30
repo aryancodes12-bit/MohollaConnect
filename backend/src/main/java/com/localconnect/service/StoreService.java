@@ -43,6 +43,8 @@ public class StoreService {
                 .location(request.getLocation())
                 .category(request.getCategory())
                 .description(request.getDescription())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .status(initialStatus)
                 .build();
 
@@ -90,6 +92,12 @@ public class StoreService {
         store.setCategory(request.getCategory());
         if (request.getDescription() != null) {
             store.setDescription(request.getDescription());
+        }
+        if (request.getLatitude() != null) {
+            store.setLatitude(request.getLatitude());
+        }
+        if (request.getLongitude() != null) {
+            store.setLongitude(request.getLongitude());
         }
 
         // If previously rejected, re-enter approval queue on edit
@@ -157,6 +165,8 @@ public class StoreService {
                 .description(store.getDescription())
                 .status(store.getStatus())
                 .rejectionReason(store.getRejectionReason())
+                .latitude(store.getLatitude())
+                .longitude(store.getLongitude())
                 .createdAt(store.getCreatedAt())
                 .build();
     }

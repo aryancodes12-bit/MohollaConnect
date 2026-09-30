@@ -13,12 +13,14 @@ import {
   ArrowUpDown,
   Filter,
   CheckCircle2,
-  RotateCcw
+  RotateCcw,
+  Navigation
 } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import ProductImage from '../components/ProductImage';
+import { calculateHaversineDistance } from '../utils/geoUtils';
 
 // Friendly category display names & mapping to backend categories
 const CATEGORY_MAP = [
@@ -38,6 +40,11 @@ export default function DiscoverPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Location state for distance-based discovery
+  const [buyerLocation, setBuyerLocation] = useState(null); // { lat, lng }
+  const [locationDenied, setLocationDenied] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+
   // Filters state
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,7 +52,7 @@ export default function DiscoverPage() {
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedLocality, setSelectedLocality] = useState('ALL');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [sortBy, setSortBy] = useState('DEFAULT'); // 'DEFAULT' | 'PRICE_ASC' | 'PRICE_DESC' | 'NEWEST' | 'TITLE_ASC'
+  const [sortBy, setSortBy] = useState('DEFAULT'); // 'DEFAULT' | 'NEAR_ME' | 'PRICE_ASC' | 'PRICE_DESC' | 'NEWEST' | 'TITLE_ASC'
 
   // UI state
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -57,7 +64,31 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     fetchProducts();
+    requestBuyerLocation();
   }, []);
+
+  const requestBuyerLocation = () => {
+    if (!navigator.geolocation) {
+      return;
+    }
+    setIsDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setBuyerLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setLocationDenied(false);
+        setIsDetectingLocation(false);
+      },
+      (err) => {
+        console.info('Geolocation permission not granted or unavailable:', err.message);
+        setLocationDenied(true);
+        setIsDetectingLocation(false);
+      },
+      { timeout: 8000 }
+    );
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -162,6 +193,21 @@ export default function DiscoverPage() {
         return true;
       })
       .sort((a, b) => {
+        if (sortBy === 'NEAR_ME' && buyerLocation) {
+          const distA = calculateHaversineDistance(
+            buyerLocation.lat,
+            buyerLocation.lng,
+            a.storeLatitude,
+            a.storeLongitude
+          ) ?? 999999;
+          const distB = calculateHaversineDistance(
+            buyerLocation.lat,
+            buyerLocation.lng,
+            b.storeLatitude,
+            b.storeLongitude
+          ) ?? 999999;
+          return distA - distB;
+        }
         if (sortBy === 'PRICE_ASC') {
           return Number(a.price) - Number(b.price);
         }
@@ -176,7 +222,7 @@ export default function DiscoverPage() {
         }
         return 0; // Default order
       });
-  }, [products, selectedCategory, searchQuery, minPrice, maxPrice, selectedLocality, inStockOnly, sortBy]);
+  }, [products, selectedCategory, searchQuery, minPrice, maxPrice, selectedLocality, inStockOnly, sortBy, buyerLocation]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -324,17 +370,40 @@ export default function DiscoverPage() {
             </label>
           </div>
 
-          {/* Right: Sort By Dropdown */}
+          {/* Right: Sort By Dropdown & Location Toggle */}
           <div className="flex items-center gap-2 text-xs">
+            {buyerLocation ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-neem/10 text-neem font-medium border border-neem/25 text-[11px]" title="Location detected">
+                <Navigation className="w-3 h-3 text-neem fill-neem" /> Near You
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={requestBuyerLocation}
+                disabled={isDetectingLocation}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-clay/10 text-clay font-medium border border-clay/20 hover:bg-clay/20 text-[11px] transition-colors cursor-pointer"
+                title="Enable browser GPS to sort by distance"
+              >
+                <Navigation className={`w-3 h-3 ${isDetectingLocation ? 'animate-spin' : ''}`} />
+                {isDetectingLocation ? 'Detecting...' : 'Enable Near Me'}
+              </button>
+            )}
+
             <span className="text-indigo/60 font-medium flex items-center gap-1">
               <ArrowUpDown className="w-3.5 h-3.5 text-clay" /> Sort:
             </span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === 'NEAR_ME' && !buyerLocation) {
+                  requestBuyerLocation();
+                }
+                setSortBy(e.target.value);
+              }}
               className="bg-ivory border border-clay/15 rounded-xl px-3 py-2 font-medium text-indigo focus:outline-none focus:ring-1 focus:ring-clay cursor-pointer text-xs"
             >
               <option value="DEFAULT">Featured</option>
+              <option value="NEAR_ME">📍 Near Me (Distance)</option>
               <option value="PRICE_ASC">Price: Low to High</option>
               <option value="PRICE_DESC">Price: High to Low</option>
               <option value="NEWEST">Newest First</option>
@@ -428,6 +497,9 @@ export default function DiscoverPage() {
           {filteredProducts.map((product) => {
             const isJustAdded = addedIds.includes(product.id);
             const categoryName = product.storeCategory || product.category || 'KIRANA';
+            const distanceKm = buyerLocation && product.storeLatitude && product.storeLongitude
+              ? calculateHaversineDistance(buyerLocation.lat, buyerLocation.lng, product.storeLatitude, product.storeLongitude)
+              : null;
 
             return (
               <motion.div
@@ -440,7 +512,12 @@ export default function DiscoverPage() {
                 className="bg-warmwhite rounded-2xl border border-clay/15 shadow-warm hover:shadow-warm-lg transition-all flex flex-col justify-between overflow-hidden cursor-pointer group relative"
               >
                 {/* Product Image with Market-Stall Irregular Frame */}
-                <div className="p-3 pb-0">
+                <div className="p-3 pb-0 relative">
+                  {distanceKm !== null && (
+                    <div className="absolute top-5 right-5 z-20 bg-ivory/95 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-bold text-neem shadow-sm border border-neem/30 flex items-center gap-1">
+                      <Navigation className="w-2.5 h-2.5 fill-neem" /> {distanceKm} km away
+                    </div>
+                  )}
                   <ProductImage
                     src={product.imageUrl}
                     alt={product.title}
@@ -568,6 +645,17 @@ export default function DiscoverPage() {
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-clay" /> {selectedProduct.storeLocation || selectedProduct.location}
                   </span>
+                  {buyerLocation && selectedProduct.storeLatitude && selectedProduct.storeLongitude && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-neem/15 text-neem border border-neem/30">
+                      <Navigation className="w-2.5 h-2.5 fill-neem" />
+                      {calculateHaversineDistance(
+                        buyerLocation.lat,
+                        buyerLocation.lng,
+                        selectedProduct.storeLatitude,
+                        selectedProduct.storeLongitude
+                      )} km away
+                    </span>
+                  )}
                 </div>
               </div>
 

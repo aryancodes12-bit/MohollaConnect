@@ -15,6 +15,7 @@ import {
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import LocationPicker from '../components/LocationPicker';
 
 const STORE_CATEGORIES = [
   'Kirana Store',
@@ -41,6 +42,8 @@ export default function StoreSettingsPage() {
     category: 'Kirana Store',
     location: '',
     description: '',
+    latitude: null,
+    longitude: null,
   });
 
   useEffect(() => {
@@ -60,6 +63,8 @@ export default function StoreSettingsPage() {
           category: res.data.category || 'Kirana Store',
           location: res.data.location || '',
           description: res.data.description || '',
+          latitude: res.data.latitude || null,
+          longitude: res.data.longitude || null,
         });
       }
     } catch (err) {
@@ -197,19 +202,25 @@ export default function StoreSettingsPage() {
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-indigo flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-clay" /> Locality / Mohalla Area
-              </label>
-              <input
-                type="text"
-                required
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="e.g. Indiranagar, 12th Main"
-                className="w-full px-4 py-2.5 rounded-xl border border-clay/30 bg-white text-indigo text-sm focus:outline-none focus:ring-2 focus:ring-clay/30 font-body"
-              />
-            </div>
+          </div>
+
+          {/* Precise Store Geolocation Picker */}
+          <div className="pt-2">
+            <LocationPicker
+              initialAddress={form.location}
+              initialLat={form.latitude}
+              initialLng={form.longitude}
+              label="Store / Workshop Precise Geolocation & Pin Drop"
+              helperText="Search your bazaar locality in India or use current GPS. Drag the clay pin on the map to pin-point your exact workshop or storefront so local buyers find you on the Bazaar Map."
+              onLocationSelect={({ addressText, latitude, longitude }) => {
+                setForm((prev) => ({
+                  ...prev,
+                  location: addressText,
+                  latitude,
+                  longitude,
+                }));
+              }}
+            />
           </div>
 
           <div className="space-y-1">

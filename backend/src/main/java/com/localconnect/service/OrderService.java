@@ -76,6 +76,8 @@ public class OrderService {
                 .customerName(request.getCustomerName() != null ? request.getCustomerName() : buyer.getName())
                 .status("PLACED")
                 .checkoutGroupId(checkoutGroupId)
+                .deliveryLatitude(request.getDeliveryLatitude())
+                .deliveryLongitude(request.getDeliveryLongitude())
                 .otpAttempts(0)
                 .build();
 
@@ -121,6 +123,8 @@ public class OrderService {
                     .customerName(request.getCustomerName() != null ? request.getCustomerName() : buyer.getName())
                     .status("PLACED")
                     .checkoutGroupId(checkoutGroupId)
+                    .deliveryLatitude(request.getDeliveryLatitude())
+                    .deliveryLongitude(request.getDeliveryLongitude())
                     .otpAttempts(0)
                     .build();
 
@@ -308,6 +312,8 @@ public class OrderService {
                 .customerPhone(order.getCustomerPhone())
                 .customerName(order.getCustomerName())
                 .checkoutGroupId(order.getCheckoutGroupId())
+                .deliveryLatitude(order.getDeliveryLatitude())
+                .deliveryLongitude(order.getDeliveryLongitude())
                 .createdAt(order.getCreatedAt())
                 .build();
     }

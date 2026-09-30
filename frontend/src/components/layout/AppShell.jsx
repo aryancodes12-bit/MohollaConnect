@@ -11,7 +11,10 @@ import {
   LogOut,
   Sparkles,
   ShieldCheck,
-  Store
+  Store,
+  MapPin,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +40,7 @@ export default function AppShell({ children }) {
   // Mobile Bottom Tab Bar Links
   const navItems = [
     { label: 'Discover', path: '/', icon: Compass },
+    { label: 'Bazaar Map', path: '/bazaar-map', icon: MapPin },
     ...(user ? [{ label: 'Community', path: '/community', icon: Users }] : []),
     ...(user
       ? isSeller || isPendingSeller || isAdmin
@@ -77,6 +81,17 @@ export default function AppShell({ children }) {
               }
             >
               Discover
+            </NavLink>
+            <NavLink
+              to="/bazaar-map"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  isActive ? 'bg-clay/10 text-clay font-semibold' : 'text-indigo/80 hover:bg-clay/5 hover:text-indigo'
+                }`
+              }
+            >
+              <MapPin className="w-3.5 h-3.5 text-clay" />
+              Bazaar Map
             </NavLink>
             {user && (
               <NavLink
@@ -122,6 +137,17 @@ export default function AppShell({ children }) {
                 >
                   Store Settings
                 </NavLink>
+                <NavLink
+                  to="/dashboard/analytics"
+                  className={({ isActive }) =>
+                    `px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1 ${
+                      isActive ? 'bg-clay/10 text-clay font-semibold' : 'text-indigo/80 hover:bg-clay/5 hover:text-indigo'
+                    }`
+                  }
+                >
+                  <TrendingUp className="w-3.5 h-3.5 text-clay" />
+                  Analytics
+                </NavLink>
               </>
             )}
             {user && (user.role === 'BUYER' || user.role === 'ADMIN') && (
@@ -149,16 +175,29 @@ export default function AppShell({ children }) {
               </NavLink>
             )}
             {user && isAdmin && (
-              <NavLink
-                to="/admin/sellers"
-                className={({ isActive }) =>
-                  `px-3.5 py-2 rounded-xl text-sm font-bold transition-all text-marigold bg-indigo/90 hover:bg-indigo ${
-                    isActive ? 'ring-2 ring-marigold' : ''
-                  }`
-                }
-              >
-                Approval Queue
-              </NavLink>
+              <>
+                <NavLink
+                  to="/admin/sellers"
+                  className={({ isActive }) =>
+                    `px-3.5 py-2 rounded-xl text-sm font-bold transition-all text-marigold bg-indigo/90 hover:bg-indigo ${
+                      isActive ? 'ring-2 ring-marigold' : ''
+                    }`
+                  }
+                >
+                  Approval Queue
+                </NavLink>
+                <NavLink
+                  to="/admin/bi-dashboard"
+                  className={({ isActive }) =>
+                    `px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 text-warmwhite bg-clay hover:bg-clay/90 ${
+                      isActive ? 'ring-2 ring-clay/50' : ''
+                    }`
+                  }
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  BI Dashboard
+                </NavLink>
+              </>
             )}
             <NavLink
               to="/welcome"

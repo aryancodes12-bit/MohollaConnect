@@ -16,6 +16,8 @@ public class ProductResponse {
     private String storeStatus;
     private String storeLocation;
     private String storeCategory;
+    private Double storeLatitude;
+    private Double storeLongitude;
     private String title;
     private String description;
     private BigDecimal price;

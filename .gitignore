@@ -21,6 +21,21 @@ backend/bin/
 
 # Environment files (keep .env.example, ignore .env)
 frontend/.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+
+# Metabase Standalone Binaries & Embedded DB
+metabase.jar
+metabase.db.*
+plugins/
 
 # IDE
 .idea/
@@ -31,3 +46,4 @@ frontend/.env
 # OS
 .DS_Store
 Thumbs.db
+

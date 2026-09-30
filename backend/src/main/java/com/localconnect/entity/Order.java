@@ -41,7 +41,7 @@ public class Order {
     @Column(name = "otp_attempts")
     private Integer otpAttempts;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "delivery_address", columnDefinition = "TEXT")
@@ -55,6 +55,12 @@ public class Order {
 
     @Column(name = "checkout_group_id")
     private String checkoutGroupId;
+
+    @Column(name = "delivery_latitude")
+    private Double deliveryLatitude;
+
+    @Column(name = "delivery_longitude")
+    private Double deliveryLongitude;
 
     @PrePersist
     protected void onCreate() {

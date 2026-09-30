@@ -19,6 +19,7 @@ import {
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import LocationPicker from '../components/LocationPicker';
 
 const STORE_CATEGORIES = [
   { value: 'HANDICRAFTS', label: 'Handicrafts & Pottery (हस्तशिल्प)' },
@@ -49,6 +50,8 @@ export default function AuthPage() {
   const [storeCategory, setStoreCategory] = useState('HANDICRAFTS');
   const [storeLocation, setStoreLocation] = useState('');
   const [storeDescription, setStoreDescription] = useState('');
+  const [storeLatitude, setStoreLatitude] = useState(null);
+  const [storeLongitude, setStoreLongitude] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
@@ -186,6 +189,8 @@ export default function AuthPage() {
                 category: storeCategory,
                 location: storeLocation.trim(),
                 description: storeDescription.trim() || 'Authentic handmade creations.',
+                latitude: storeLatitude,
+                longitude: storeLongitude,
               });
               toast.success('Store application submitted! Awaiting Mohalla Admin approval.');
             } catch (storeErr) {
@@ -488,18 +493,18 @@ export default function AuthPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-indigo/80">Locality / Mohalla Address</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      value={storeLocation}
-                      onChange={(e) => setStoreLocation(e.target.value)}
-                      placeholder="e.g. Johari Bazaar, Jaipur, Rajasthan (302003)"
-                      className="w-full px-4 py-3 pl-10 rounded-xl border border-clay/20 bg-ivory/60 focus:bg-warmwhite focus:outline-none focus:border-clay text-sm text-indigo transition-all"
-                    />
-                    <MapPin className="w-4 h-4 text-clay absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  </div>
+                  <LocationPicker
+                    initialAddress={storeLocation}
+                    initialLat={storeLatitude}
+                    initialLng={storeLongitude}
+                    label="Workshop / Store Address & Map Location"
+                    helperText="Search your locality in India. Drag the terracotta pin to mark your workshop location on the Bazaar Map."
+                    onLocationSelect={({ addressText, latitude, longitude }) => {
+                      setStoreLocation(addressText);
+                      setStoreLatitude(latitude);
+                      setStoreLongitude(longitude);
+                    }}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
