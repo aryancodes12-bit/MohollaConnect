@@ -24,4 +24,8 @@ public class CheckoutRequest {
     private String customerPhone;
 
     private String customerName;
+
+    private Double deliveryLatitude;
+
+    private Double deliveryLongitude;
 }

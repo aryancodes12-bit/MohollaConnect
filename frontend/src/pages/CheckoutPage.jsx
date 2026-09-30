@@ -17,6 +17,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
+import LocationPicker from '../components/LocationPicker';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ export default function CheckoutPage() {
     addressLine: '',
     locality: '',
     pinCode: '',
+    deliveryLatitude: null,
+    deliveryLongitude: null,
   });
 
   const [upiId, setUpiId] = useState('user@okhdfcbank');
@@ -57,8 +60,8 @@ export default function CheckoutPage() {
 
   const handleAddressSubmit = (e) => {
     e.preventDefault();
-    if (!address.name || !address.phone || !address.addressLine || !address.locality || !address.pinCode) {
-      showToast('Please fill all delivery address fields', 'error');
+    if (!address.name || !address.phone || !address.locality) {
+      showToast('Please fill all delivery address and location fields', 'error');
       return;
     }
     setCurrentStep(2);
@@ -76,7 +79,9 @@ export default function CheckoutPage() {
 
   const handlePlaceFinalOrders = async () => {
     setIsPlacingOrders(true);
-    const fullAddress = `${address.addressLine}, ${address.locality}, PIN: ${address.pinCode}`;
+    const fullAddress = address.addressLine 
+      ? `${address.addressLine}, ${address.locality}${address.pinCode ? `, PIN: ${address.pinCode}` : ''}`
+      : address.locality;
     
     try {
       const payload = {
@@ -87,6 +92,8 @@ export default function CheckoutPage() {
         deliveryAddress: fullAddress,
         customerPhone: address.phone,
         customerName: address.name,
+        deliveryLatitude: address.deliveryLatitude,
+        deliveryLongitude: address.deliveryLongitude,
       };
 
       const res = await api.post('/orders/checkout', payload);
@@ -285,40 +292,54 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-indigo">House / Flat / Street Address</label>
+                <label className="text-xs font-bold text-indigo">House / Flat / Building / Floor</label>
                 <input
                   type="text"
                   required
                   value={address.addressLine}
                   onChange={(e) => setAddress({ ...address, addressLine: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-clay/30 bg-warmwhite text-indigo text-sm focus:outline-none focus:ring-2 focus:ring-clay/30"
-                  placeholder="e.g. Flat 402, Shanti Nilayam, MG Road"
+                  placeholder="e.g. Flat 402, Shanti Nilayam, 4th Cross"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-indigo">Locality / Area</label>
-                  <input
-                    type="text"
-                    required
-                    value={address.locality}
-                    onChange={(e) => setAddress({ ...address, locality: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-clay/30 bg-warmwhite text-indigo text-sm focus:outline-none focus:ring-2 focus:ring-clay/30"
-                    placeholder="e.g. Andheri West / Indiranagar"
-                  />
-                </div>
+              {/* Free Nominatim Search + Draggable Leaflet Pin */}
+              <div className="pt-1">
+                <LocationPicker
+                  initialAddress={address.locality}
+                  initialLat={address.deliveryLatitude}
+                  initialLng={address.deliveryLongitude}
+                  label="Search Delivery Locality / Mohalla & Drop Pin"
+                  helperText="Search any neighbourhood or colony in India. Drag the terracotta pin on the OpenStreetMap to specify your exact delivery doorstep."
+                  onLocationSelect={({ addressText, latitude, longitude }) => {
+                    setAddress((prev) => ({
+                      ...prev,
+                      locality: addressText,
+                      deliveryLatitude: latitude,
+                      deliveryLongitude: longitude,
+                    }));
+                  }}
+                />
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-indigo">PIN Code</label>
+                  <label className="text-xs font-bold text-indigo">PIN Code (Optional)</label>
                   <input
                     type="text"
-                    required
                     value={address.pinCode}
                     onChange={(e) => setAddress({ ...address, pinCode: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-clay/30 bg-warmwhite text-indigo text-sm focus:outline-none focus:ring-2 focus:ring-clay/30"
                     placeholder="e.g. 560038"
                   />
+                </div>
+                <div className="flex items-end">
+                  {address.deliveryLatitude && (
+                    <div className="text-xs text-neem font-semibold bg-neem/10 border border-neem/20 rounded-xl px-3 py-2.5 w-full flex items-center gap-1.5">
+                      <CheckCircle className="w-4 h-4 text-neem shrink-0" />
+                      <span>GPS Geocoded: {address.deliveryLatitude.toFixed(4)}, {address.deliveryLongitude.toFixed(4)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -20,4 +20,8 @@ public class StoreRequest {
     private String category;
 
     private String description;
+
+    private Double latitude;
+
+    private Double longitude;
 }

@@ -38,6 +38,12 @@ public class Store {
     @Column(name = "rejection_reason")
     private String rejectionReason;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     @Column(name = "created_at")
     private java.time.LocalDateTime createdAt;
 

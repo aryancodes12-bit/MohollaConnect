@@ -17,5 +17,7 @@ public class StoreResponse {
     private String description;
     private String status;
     private String rejectionReason;
+    private Double latitude;
+    private Double longitude;
     private java.time.LocalDateTime createdAt;
 }
