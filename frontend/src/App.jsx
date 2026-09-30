@@ -22,6 +22,8 @@ import StoreSettingsPage from './pages/StoreSettingsPage';
 import AdminSellerQueuePage from './pages/AdminSellerQueuePage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
+import SellerAnalyticsPage from './pages/SellerAnalyticsPage';
+import MarketplaceBIDashboardPage from './pages/MarketplaceBIDashboardPage';
 import DesignTokens from './pages/DesignTokens';
 
 // Components
@@ -145,10 +147,28 @@ export default function App() {
                       />
 
                       <Route
+                        path="/dashboard/analytics"
+                        element={
+                          <ProtectedRoute roles={['SELLER', 'PENDING_SELLER', 'ADMIN']}>
+                            <SellerAnalyticsPage />
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      <Route
                         path="/admin/sellers"
                         element={
                           <ProtectedRoute roles={['ADMIN']}>
                             <AdminSellerQueuePage />
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      <Route
+                        path="/admin/bi-dashboard"
+                        element={
+                          <ProtectedRoute roles={['ADMIN', 'SELLER', 'BUYER']}>
+                            <MarketplaceBIDashboardPage />
                           </ProtectedRoute>
                         }
                       />
