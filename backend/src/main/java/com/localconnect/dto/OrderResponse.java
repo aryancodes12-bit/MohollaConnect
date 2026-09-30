@@ -26,5 +26,7 @@ public class OrderResponse {
     private String customerPhone;
     private String customerName;
     private String checkoutGroupId;
+    private Double deliveryLatitude;
+    private Double deliveryLongitude;
     private LocalDateTime createdAt;
 }

@@ -21,4 +21,6 @@ public class OrderRequest {
     private String deliveryAddress;
     private String customerPhone;
     private String customerName;
+    private Double deliveryLatitude;
+    private Double deliveryLongitude;
 }

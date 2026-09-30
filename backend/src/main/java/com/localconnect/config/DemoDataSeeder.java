@@ -57,12 +57,18 @@ public class DemoDataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        // ── Backfill coordinates for existing stores if null ───────────────────
+        backfillCoordinatesIfNull();
+
+        // ── Seed / backfill historical 45-day sales & reviews for all 13 stores ──
+        seedHistoricalSalesAndReviewsIfSparse();
+
         // ── Idempotency guard ──────────────────────────────────────────────────
         if (userRepo.existsByEmail(SENTINEL_EMAIL)) {
-            log.info("[DemoSeeder] Demo data already present — skipping.");
+            log.info("[DemoSeeder] Demo data already present — skipping new insertion.");
             return;
         }
-        log.info("[DemoSeeder] Seeding demo data...");
+        log.info("[DemoSeeder] Seeding demo data with precise coordinates...");
 
         String hash = passwordEncoder.encode(DEMO_PASSWORD);
 
@@ -112,67 +118,67 @@ public class DemoDataSeeder implements CommandLineRunner {
         Store kiranaStore = saveStore("Sharma Kirana Store", "KIRANA",
                 "Sector 12, Dwarka, New Delhi – 110075",
                 "Your neighbourhood one-stop kirana since 1998. We stock everything from daily dals and oils to packaged snacks and household basics — fresh stock every morning, home delivery in Dwarka Sector 12 and 13.",
-                kiranaOwner, "APPROVED");
+                kiranaOwner, "APPROVED", 28.5921, 77.0460);
 
         Store dairyStore = saveStore("Krishna Dairy Booth", "DAIRY",
                 "Vastrapur, Ahmedabad – 380015",
                 "Farm-fresh dairy delivered straight to your door every morning before 7 AM. Our cows graze on open pastures in Anand — pure, unadulterated milk and paneer, no additives.",
-                dairyOwner, "APPROVED");
+                dairyOwner, "APPROVED", 23.0365, 72.5284);
 
         Store vegStore = saveStore("Fresh Mandi Basket", "VEGETABLES",
                 "Malviya Nagar Market, Jaipur – 302017",
                 "Direct from Jaipur's Muhana Mandi wholesale market to your doorstep. Bulk vegetable and seasonal fruit orders welcome — best prices guaranteed for housing societies and offices.",
-                vegOwner, "APPROVED");
+                vegOwner, "APPROVED", 26.8530, 75.8197);
 
         Store tailorStore = saveStore("Fatima Tailoring House", "TAILORING",
                 "Bhendi Bazaar, Mumbai – 400003",
                 "Three generations of stitching mastery. We specialise in ladies' blouses, salwar-kameez, and kurtas with custom measurements. Walk-ins welcome; home visit for 5+ orders.",
-                tailorOwner, "APPROVED");
+                tailorOwner, "APPROVED", 18.9583, 72.8339);
 
         Store ironStore = saveStore("Ramesh Istri Center", "LAUNDRY",
                 "Laxmi Nagar, Delhi – 110092",
                 "Fast, affordable ironing for your entire family. Daily pickup from door, ironed clothes returned same evening. Monthly subscription available for households and small offices.",
-                ironOwner, "PENDING");
+                ironOwner, "PENDING", 28.6304, 77.2773);
 
         Store craftStore = saveStore("Saharanpur Sheesham Crafts", "HANDICRAFTS",
                 "Saharanpur Wood Mandi, Saharanpur, UP – 247001",
                 "We are fourth-generation wood artisans from Saharanpur, the carved-furniture capital of India. Every piece is hand-cut from sustainably sourced sheesham and teak, finished with natural lacquers.",
-                craftOwner, "APPROVED");
+                craftOwner, "APPROVED", 29.9678, 77.5460);
 
         Store spiceStore = saveStore("Kerala Spice Corner", "FOOD",
                 "Ernakulam Market, Kochi, Kerala – 682011",
                 "Sourced directly from spice gardens in Idukki and Wayanad districts. Whole spices dried naturally and ground fresh on order — no artificial colouring, no anti-caking agents.",
-                spiceOwner, "APPROVED");
+                spiceOwner, "APPROVED", 9.9816, 76.2829);
 
         Store bakeryStore = saveStore("Priya's Home Bakes", "FOOD",
                 "Koramangala 5th Block, Bengaluru – 560095",
                 "Baking from my home kitchen in Koramangala since 2019. All cakes are 100% eggless. Custom orders for birthdays, anniversaries, and corporate gifting — minimum 48-hour advance notice.",
-                bakeryOwner, "APPROVED");
+                bakeryOwner, "APPROVED", 12.9352, 77.6245);
 
         Store brassStore = saveStore("Moradabad Brass House", "HANDICRAFTS",
                 "Brass Bazaar, Moradabad, UP – 244001",
                 "Moradabad is the 'Brass City' of India, and our family has been crafting here for 80 years. Puja items, home décor, and gifting pieces — each one finished by hand.",
-                brassOwner, "APPROVED");
+                brassOwner, "APPROVED", 28.8386, 78.7733);
 
         Store handloomStore = saveStore("Jaipur Block Print Studio", "TEXTILES",
                 "Sanganer, Jaipur, Rajasthan – 302029",
                 "Sanganer is India's block-printing heartland and our studio has been printing here since 1971. Natural vegetable dyes, hand-carved wooden blocks, organic cotton fabric — entirely handmade.",
-                handloomOwner, "APPROVED");
+                handloomOwner, "APPROVED", 26.8021, 75.7699);
 
         Store electricStore = saveStore("Suresh Electrical Repairs", "SERVICES",
                 "Andheri West, Mumbai – 400058",
                 "Licensed electrician serving Andheri West, Versova, and Oshiwara for 15 years. Quick response for faults, installations, and AMC contracts for residential societies.",
-                electricOwner, "APPROVED");
+                electricOwner, "APPROVED", 19.1197, 72.8464);
 
         Store mobileStore = saveStore("QuickFix Mobile Care", "SERVICES",
                 "Nehru Place, New Delhi – 110019",
                 "Genuine spare parts, 30-day repair warranty, and same-day turnaround on most models. Serving Nehru Place and Greater Kailash area. Free diagnostic for phones bought at our counter.",
-                mobileOwner, "PENDING");
+                mobileOwner, "PENDING", 28.5494, 77.2528);
 
         Store chaiStore = saveStore("Bhaiya Ji Chai Corner", "FOOD",
                 "Connaught Place, New Delhi – 110001",
                 "Serving cutting chai and hot snacks to CP office-goers since 2007. Monthly subscription available for offices — hot tea delivered at your desk, twice daily.",
-                chaiOwner, "APPROVED");
+                chaiOwner, "APPROVED", 28.6304, 77.2177);
 
         // ══════════════════════════════════════════════════════════════════
         // PRODUCTS — 1. KIRANA (expanded to ~70 products)
@@ -464,7 +470,7 @@ public class DemoDataSeeder implements CommandLineRunner {
     }
 
     private Store saveStore(String name, String category, String location,
-                             String description, User owner, String status) {
+                             String description, User owner, String status, Double lat, Double lng) {
         Store s = Store.builder()
                 .storeName(name)
                 .category(category)
@@ -472,8 +478,67 @@ public class DemoDataSeeder implements CommandLineRunner {
                 .description(description)
                 .owner(owner)
                 .status(status)
+                .latitude(lat)
+                .longitude(lng)
                 .build();
         return storeRepo.save(s);
+    }
+
+    private void backfillCoordinatesIfNull() {
+        try {
+            List<Store> existingStores = storeRepo.findAll();
+            boolean updatedAny = false;
+            for (Store store : existingStores) {
+                if (store.getLatitude() == null || store.getLongitude() == null) {
+                    double[] coords = getPredefinedCoordsForStore(store.getStoreName(), store.getLocation());
+                    store.setLatitude(coords[0]);
+                    store.setLongitude(coords[1]);
+                    storeRepo.save(store);
+                    updatedAny = true;
+                    log.info("[DemoSeeder] Backfilled coordinates for store '{}': {}, {}",
+                            store.getStoreName(), coords[0], coords[1]);
+                }
+            }
+            if (updatedAny) {
+                log.info("[DemoSeeder] Store coordinates backfill completed.");
+            }
+        } catch (Exception e) {
+            log.warn("[DemoSeeder] Error during store coordinate backfill: {}", e.getMessage());
+        }
+    }
+
+    private double[] getPredefinedCoordsForStore(String storeName, String location) {
+        String n = (storeName != null ? storeName : "").toLowerCase();
+        String loc = (location != null ? location : "").toLowerCase();
+
+        if (n.contains("sharma kirana") || loc.contains("dwarka")) {
+            return new double[]{28.5921, 77.0460};
+        } else if (n.contains("krishna dairy") || loc.contains("vastrapur")) {
+            return new double[]{23.0365, 72.5284};
+        } else if (n.contains("fresh mandi") || (loc.contains("malviya nagar") && loc.contains("jaipur"))) {
+            return new double[]{26.8530, 75.8197};
+        } else if (n.contains("fatima tailoring") || loc.contains("bhendi bazaar")) {
+            return new double[]{18.9583, 72.8339};
+        } else if (n.contains("ramesh istri") || loc.contains("laxmi nagar")) {
+            return new double[]{28.6304, 77.2773};
+        } else if (n.contains("saharanpur") || loc.contains("saharanpur")) {
+            return new double[]{29.9678, 77.5460};
+        } else if (n.contains("kerala spice") || loc.contains("ernakulam")) {
+            return new double[]{9.9816, 76.2829};
+        } else if (n.contains("home bakes") || loc.contains("koramangala")) {
+            return new double[]{12.9352, 77.6245};
+        } else if (n.contains("moradabad") || loc.contains("moradabad")) {
+            return new double[]{28.8386, 78.7733};
+        } else if (n.contains("block print") || loc.contains("sanganer")) {
+            return new double[]{26.8021, 75.7699};
+        } else if (n.contains("electrical") || loc.contains("andheri")) {
+            return new double[]{19.1197, 72.8464};
+        } else if (n.contains("quickfix") || loc.contains("nehru place")) {
+            return new double[]{28.5494, 77.2528};
+        } else if (n.contains("chai") || loc.contains("connaught")) {
+            return new double[]{28.6304, 77.2177};
+        }
+        return new double[]{28.6139, 77.2090}; // Default to Central New Delhi
     }
 
     private int imageCounter = 0;
@@ -654,4 +719,200 @@ public class DemoDataSeeder implements CommandLineRunner {
     private BigDecimal bd(String val) {
         return new BigDecimal(val);
     }
+
+    /**
+     * Seeds realistic historical order data spanning the past 45 days for all 13 demo sellers.
+     * Idempotent: checks if historical order count is already >= 200 before running.
+     */
+    private void seedHistoricalSalesAndReviewsIfSparse() {
+        long currentOrderCount = orderRepo.count();
+        if (currentOrderCount >= 150) {
+            log.info("[DemoSeeder] Historical orders already present (total: {}) — skipping backfill.", currentOrderCount);
+            return;
+        }
+
+        log.info("[DemoSeeder] Seeding realistic 45-day historical sales data and reviews across all sellers...");
+        String hash = passwordEncoder.encode(DEMO_PASSWORD);
+
+        // Ensure expanded pool of ~16 diverse buyers across India
+        String[][] buyerData = {
+            {"Sunita Sharma", "sunita.sharma@demo.localconnect.in", "Flat 402, Sector 12, Dwarka, New Delhi", "+91 9811223344"},
+            {"Vikram Mehta", "vikram.mehta@demo.localconnect.in", "Prestige Meridian, Koramangala 4th Block, Bengaluru", "+91 9845678902"},
+            {"Ayesha Khan", "ayesha.khan@demo.localconnect.in", "House 14, Marine Drive, Kochi, Kerala", "+91 9946789003"},
+            {"Rohan Deshmukh", "rohan.deshmukh@demo.localconnect.in", "Flat 12, Shanti Nagar, Andheri West, Mumbai", "+91 9712345604"},
+            {"Pooja Agarwal", "pooja.agarwal@demo.localconnect.in", "B-104, Malviya Nagar, Jaipur, Rajasthan", "+91 9829012345"},
+            {"Deepak Verma", "deepak.verma@demo.localconnect.in", "Sector 15, Rohini, New Delhi", "+91 9810987654"},
+            {"Ananya Sen", "ananya.sen@demo.localconnect.in", "Salt Lake Sector 1, Kolkata, West Bengal", "+91 9830123456"},
+            {"Karthik Raman", "karthik.raman@demo.localconnect.in", "T. Nagar, Chennai, Tamil Nadu", "+91 9840234567"},
+            {"Meera Nair", "meera.nair@demo.localconnect.in", "Kadavanthra, Kochi, Kerala", "+91 9447345678"},
+            {"Amitabh Joshi", "amitabh.joshi@demo.localconnect.in", "Kothrud, Pune, Maharashtra", "+91 9822456789"},
+            {"Neha Singhal", "neha.singhal@demo.localconnect.in", "Civil Lines, Moradabad, Uttar Pradesh", "+91 9412567890"},
+            {"Siddharth Rao", "siddharth.rao@demo.localconnect.in", "Banjara Hills, Hyderabad, Telangana", "+91 9849678901"},
+            {"Tanvi Kulkarni", "tanvi.kulkarni@demo.localconnect.in", "Viman Nagar, Pune, Maharashtra", "+91 9823789012"},
+            {"Gaurav Bhatia", "gaurav.bhatia@demo.localconnect.in", "Lajpat Nagar 2, New Delhi", "+91 9811890123"},
+            {"Farhan Qureshi", "farhan.qureshi@demo.localconnect.in", "Bhendi Bazaar, South Mumbai", "+91 9820901234"},
+            {"Shweta Patel", "shweta.patel@demo.localconnect.in", "Navrangpura, Ahmedabad, Gujarat", "+91 9825012345"}
+        };
+
+        List<User> buyers = new java.util.ArrayList<>();
+        for (String[] bd : buyerData) {
+            User u = userRepo.findByEmail(bd[1]).orElseGet(() -> {
+                User fresh = User.builder()
+                        .name(bd[0])
+                        .email(bd[1])
+                        .passwordHash(hash)
+                        .role(Role.BUYER)
+                        .build();
+                return userRepo.save(fresh);
+            });
+            buyers.add(u);
+        }
+
+        List<Store> allStores = storeRepo.findAll();
+        if (allStores.isEmpty()) {
+            log.warn("[DemoSeeder] No stores found to seed historical sales.");
+            return;
+        }
+
+        // Varied reviews with clear positive, neutral, and negative sentiment
+        String[] positiveReviews = {
+            "Exceptional quality! The authentic local craftsmanship really shows. Arrived promptly and well packed.",
+            "Wonderful experience. Absolutely fresh and far superior to supermarket items. Will order every week!",
+            "Delivered right on time by neighbour courier. Super fresh, smells divine, worth every single rupee.",
+            "Loved this product! Very neatly packaged with personal care. Proud to support local Mohalla sellers.",
+            "Outstanding taste and purity. You can immediately feel the difference from commercial brands."
+        };
+
+        String[] neutralReviews = {
+            "Delivery took longer than expected but product quality was good overall. Decent value for money.",
+            "Average experience. The item is fine for daily use, though packaging could be improved slightly.",
+            "Product is acceptable and does the job, but communication regarding delivery timing was a bit slow.",
+            "Fair quality. Nothing extraordinary, but convenient to get delivered straight to our apartment lobby."
+        };
+
+        String[] negativeReviews = {
+            "Disappointed with the delay. Arrived two days late and the outer box was slightly dented.",
+            "Not completely satisfied. Expected fresher quality based on the pictures. Needs better standardisation.",
+            "The packaging was leaking slightly on arrival. Quality is mediocre for the price charged."
+        };
+
+        int totalOrdersCreated = 0;
+        int totalReviewsCreated = 0;
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Store store : allStores) {
+            List<Product> products = productRepo.findByStoreId(store.getId());
+            if (products.isEmpty()) continue;
+
+            String cat = (store.getCategory() != null ? store.getCategory() : "").toUpperCase();
+
+            // Order volume scale depending on category
+            // High frequency: KIRANA (55-65), VEGETABLES (50-60), DAIRY (45-55), FOOD (35-45)
+            // Mid frequency: SERVICES (25-35), TEXTILES (20-30), LAUNDRY (25-35)
+            // Low frequency (high ticket): HANDICRAFTS (18-24)
+            int targetOrderCount;
+            if (cat.contains("KIRANA")) targetOrderCount = 55 + secureRandom.nextInt(10);
+            else if (cat.contains("VEGETABLE")) targetOrderCount = 48 + secureRandom.nextInt(12);
+            else if (cat.contains("DAIRY")) targetOrderCount = 42 + secureRandom.nextInt(10);
+            else if (cat.contains("FOOD")) targetOrderCount = 35 + secureRandom.nextInt(10);
+            else if (cat.contains("LAUNDRY") || cat.contains("TAILORING") || cat.contains("SERVICE")) targetOrderCount = 25 + secureRandom.nextInt(8);
+            else targetOrderCount = 18 + secureRandom.nextInt(8); // HANDICRAFTS, TEXTILES
+
+            int storeReviewsCount = 0;
+
+            for (int i = 0; i < targetOrderCount; i++) {
+                // Non-uniform date distribution over past 45 days
+                // Marketplace growing: more recent orders (lower daysAgo)
+                int daysAgo;
+                int randDist = secureRandom.nextInt(100);
+                if (randDist < 45) {
+                    daysAgo = 1 + secureRandom.nextInt(14); // 45% in last 14 days
+                } else if (randDist < 75) {
+                    daysAgo = 15 + secureRandom.nextInt(16); // 30% in days 15-30
+                } else {
+                    daysAgo = 31 + secureRandom.nextInt(14); // 25% in days 31-44
+                }
+
+                // Add time of day variation with weekend peaks
+                int hour = 8 + secureRandom.nextInt(13);
+                int minute = secureRandom.nextInt(60);
+                LocalDateTime orderDate = now.minusDays(daysAgo).withHour(hour).withMinute(minute).withSecond(0);
+
+                // Realistic product repeat pattern: first 2-3 products get chosen more often
+                Product chosenProduct;
+                if (products.size() > 2 && secureRandom.nextInt(100) < 65) {
+                    chosenProduct = products.get(secureRandom.nextInt(Math.min(3, products.size())));
+                } else {
+                    chosenProduct = products.get(secureRandom.nextInt(products.size()));
+                }
+
+                int buyerIdx = secureRandom.nextInt(buyers.size());
+                User buyer = buyers.get(buyerIdx);
+                String[] bInfo = buyerData[buyerIdx % buyerData.length];
+
+                int quantity = 1;
+                if (cat.contains("KIRANA") || cat.contains("DAIRY") || cat.contains("VEGETABLE")) {
+                    quantity = 1 + secureRandom.nextInt(3);
+                }
+
+                // Build Delivered Historical Order with backdated timestamp
+                Order histOrder = Order.builder()
+                        .buyer(buyer)
+                        .product(chosenProduct)
+                        .quantity(quantity)
+                        .status("DELIVERED")
+                        .deliveryAddress(bInfo[2])
+                        .customerPhone(bInfo[3])
+                        .customerName(buyer.getName())
+                        .checkoutGroupId(java.util.UUID.randomUUID().toString())
+                        .deliveryLatitude(store.getLatitude() != null ? store.getLatitude() + (secureRandom.nextDouble() - 0.5) * 0.05 : 28.6139)
+                        .deliveryLongitude(store.getLongitude() != null ? store.getLongitude() + (secureRandom.nextDouble() - 0.5) * 0.05 : 77.2090)
+                        .deliveryOtp(null)
+                        .otpExpiresAt(null)
+                        .otpAttempts(0)
+                        .createdAt(orderDate)
+                        .build();
+
+                orderRepo.save(histOrder);
+                totalOrdersCreated++;
+
+                // Attach reviews to a subset (~15-20% of orders, at least 4-6 reviews per store)
+                if (storeReviewsCount < 6 && secureRandom.nextInt(100) < 22) {
+                    int sentimentRoll = secureRandom.nextInt(100);
+                    int rating;
+                    String comment;
+
+                    if (sentimentRoll < 65) { // 65% Positive
+                        rating = 4 + secureRandom.nextInt(2); // 4 or 5
+                        comment = positiveReviews[secureRandom.nextInt(positiveReviews.length)] +
+                                " (Purchased: " + chosenProduct.getTitle() + ")";
+                    } else if (sentimentRoll < 85) { // 20% Neutral
+                        rating = 3;
+                        comment = neutralReviews[secureRandom.nextInt(neutralReviews.length)] +
+                                " (Order: " + chosenProduct.getTitle() + ")";
+                    } else { // 15% Mild Negative
+                        rating = 1 + secureRandom.nextInt(2); // 1 or 2
+                        comment = negativeReviews[secureRandom.nextInt(negativeReviews.length)] +
+                                " (Purchased: " + chosenProduct.getTitle() + ")";
+                    }
+
+                    Review r = Review.builder()
+                            .product(chosenProduct)
+                            .user(buyer)
+                            .rating(rating)
+                            .commentText(comment)
+                            .createdAt(orderDate.plusDays(1 + secureRandom.nextInt(2)))
+                            .build();
+
+                    reviewRepo.save(r);
+                    storeReviewsCount++;
+                    totalReviewsCreated++;
+                }
+            }
+        }
+
+        log.info("[DemoSeeder] Successfully seeded {} historical orders and {} sentiment-rich reviews across 45 days!",
+                totalOrdersCreated, totalReviewsCreated);
+    }
 }
+
