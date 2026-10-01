@@ -16,6 +16,8 @@ import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { createClayMarkerIcon } from '../utils/mapIcons';
 
 export default function StorefrontPage() {
   const { storeId } = useParams();
@@ -99,20 +101,29 @@ export default function StorefrontPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-      {/* Back Link & Pending Owner Notice */}
+      {/* Back Links & Pending Owner Notice */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-indigo/70 hover:text-clay transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Discover
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/bazaar-map"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo/80 hover:text-clay transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Bazaar Map
+            </Link>
+            <span className="text-indigo/30">•</span>
+            <Link
+              to="/"
+              className="text-xs font-semibold text-indigo/60 hover:text-clay transition-colors"
+            >
+              Discover
+            </Link>
+          </div>
 
           {isOwner && (
             <Link
               to="/dashboard/store"
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warmwhite border border-clay/20 text-clay hover:bg-white transition-all"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warmwhite border border-clay/20 text-clay hover:bg-white transition-all shadow-sm"
             >
               Edit Store Settings
             </Link>
@@ -130,43 +141,93 @@ export default function StorefrontPage() {
       </div>
 
       {/* Storefront Hero Header */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-indigo via-indigo/95 to-deepdark text-warmwhite p-8 md:p-12 shadow-2xl foil-border">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-indigo via-indigo/95 to-deepdark text-warmwhite p-6 sm:p-8 md:p-10 shadow-2xl foil-border-indigo">
         {/* Lattice overlay */}
         <div className="absolute inset-0 jali-bg opacity-15 pointer-events-none"></div>
 
-        <div className="relative z-10 max-w-3xl space-y-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-clay text-warmwhite">
-              {store.category}
-            </span>
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Store Info */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-clay text-warmwhite shadow-sm">
+                {store.category}
+              </span>
 
-            {isApproved ? (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold badge-seller flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4" /> Verified Mohalla Seller
+              {isApproved ? (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-neem/25 text-emerald-300 border border-neem/40">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" /> Verified Mohalla Seller
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-marigold/20 text-marigold border border-marigold/40">
+                  <Clock className="w-4 h-4 text-marigold" /> Approval Pending
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display text-warmwhite tracking-tight leading-tight">
+              {store.storeName}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-3 text-warmwhite/80 text-sm">
+              <span className="flex items-center gap-1.5 font-medium text-warmwhite">
+                <MapPin className="w-4 h-4 text-marigold shrink-0" />
+                {store.location}
               </span>
-            ) : (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold badge-pending flex items-center gap-1.5">
-                <Clock className="w-4 h-4" /> Approval Pending
-              </span>
+              <span className="text-warmwhite/30 hidden sm:inline">•</span>
+              <span>Proprietor: <strong className="text-warmwhite font-semibold">{store.ownerName}</strong></span>
+            </div>
+
+            {store.description && (
+              <p className="text-warmwhite/90 text-sm leading-relaxed bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 max-w-2xl">
+                {store.description}
+              </p>
             )}
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-display text-warmwhite tracking-tight">
-            {store.storeName}
-          </h1>
+          {/* Interactive Mini-Map / Location Preview */}
+          <div className="lg:col-span-5 flex flex-col gap-2">
+            <div className="h-52 sm:h-56 w-full rounded-2xl overflow-hidden border border-white/20 shadow-indigo relative bg-indigo/80">
+              {store.latitude && store.longitude ? (
+                <MapContainer
+                  center={[store.latitude, store.longitude]}
+                  zoom={15}
+                  scrollWheelZoom={false}
+                  dragging={true}
+                  className="w-full h-full z-0"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker
+                    position={[store.latitude, store.longitude]}
+                    icon={createClayMarkerIcon(true)}
+                  />
+                </MapContainer>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-2">
+                  <div className="w-12 h-12 rounded-full bg-clay/20 text-clay flex items-center justify-center mx-auto">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-display text-sm text-warmwhite">{store.location}</h4>
+                  <p className="text-xs text-warmwhite/60">Workshop location verified in mohalla</p>
+                </div>
+              )}
 
-          <div className="flex items-center gap-2 text-warmwhite/80 text-sm">
-            <MapPin className="w-4 h-4 text-marigold shrink-0" />
-            <span>{store.location}</span>
-            <span className="text-warmwhite/40">•</span>
-            <span>Owner: <span className="font-semibold text-warmwhite">{store.ownerName}</span></span>
+              <div className="absolute bottom-2.5 right-2.5 z-[400]">
+                <Link
+                  to="/bazaar-map"
+                  className="px-3 py-1.5 text-xs font-bold bg-indigo/90 hover:bg-clay text-warmwhite rounded-lg shadow-md flex items-center gap-1.5 transition-all backdrop-blur-md border border-white/20 hover:scale-105"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-marigold" /> View on Bazaar Map
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-warmwhite/60 px-1">
+              <span>Verified Workshop Location</span>
+              <span>Click pin to view on Bazaar Map</span>
+            </div>
           </div>
-
-          {store.description && (
-            <p className="text-warmwhite/90 text-base leading-relaxed bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10">
-              {store.description}
-            </p>
-          )}
         </div>
       </div>
 

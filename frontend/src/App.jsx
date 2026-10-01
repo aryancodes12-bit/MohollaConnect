@@ -20,6 +20,7 @@ import ReviewSubmissionPage from './pages/ReviewSubmissionPage';
 import SellerProductsPage from './pages/SellerProductsPage';
 import StoreSettingsPage from './pages/StoreSettingsPage';
 import AdminSellerQueuePage from './pages/AdminSellerQueuePage';
+import AdminUserDirectoryPage from './pages/AdminUserDirectoryPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
 import SellerAnalyticsPage from './pages/SellerAnalyticsPage';
@@ -64,6 +65,7 @@ export default function App() {
                       {/* Public Marketplace Views */}
                       <Route path="/products/:productId" element={<ProductDetailPage />} />
                       <Route path="/stores/:storeId" element={<StorefrontPage />} />
+                      <Route path="/storefront/:storeId" element={<StorefrontPage />} />
 
                       <Route
                         path="/community"
@@ -160,6 +162,15 @@ export default function App() {
                         element={
                           <ProtectedRoute roles={['ADMIN']}>
                             <AdminSellerQueuePage />
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      <Route
+                        path="/admin/users"
+                        element={
+                          <ProtectedRoute roles={['ADMIN']}>
+                            <AdminUserDirectoryPage />
                           </ProtectedRoute>
                         }
                       />

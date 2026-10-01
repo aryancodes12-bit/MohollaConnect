@@ -280,7 +280,7 @@ export default function BazaarMapPage() {
 
                           <div className="pt-1">
                             <Link
-                              to={`/storefront/${s.id}`}
+                              to={`/stores/${s.id}`}
                               className="w-full py-1.5 px-3 rounded-lg bg-clay text-warmwhite text-xs font-bold hover:bg-saffron flex items-center justify-center gap-1 transition-all shadow-sm"
                             >
                               <span>Visit Storefront</span>
@@ -357,7 +357,7 @@ export default function BazaarMapPage() {
 
                 <div className="pt-2">
                   <Link
-                    to={`/storefront/${selectedStore.id}`}
+                    to={`/stores/${selectedStore.id}`}
                     className="w-full py-3 px-4 rounded-xl bg-clay text-warmwhite text-sm font-bold hover:bg-saffron flex items-center justify-center gap-2 transition-all shadow-warm"
                   >
                     <span>View Full Storefront & Catalog</span>
