@@ -154,7 +154,7 @@ public class StoreService {
         return mapToResponse(savedStore);
     }
 
-    private StoreResponse mapToResponse(Store store) {
+    public StoreResponse mapToResponse(Store store) {
         return StoreResponse.builder()
                 .id(store.getId())
                 .ownerId(store.getOwner().getId())
