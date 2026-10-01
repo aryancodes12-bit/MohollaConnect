@@ -248,37 +248,50 @@ export default function DiscoverPage() {
     <div className="space-y-8">
       {/* Hero Banner with Functional Search */}
       <div className="relative rounded-3xl bg-indigo text-warmwhite p-8 md:p-12 overflow-hidden jali-bg foil-border-indigo shadow-warm-lg">
-        <div className="max-w-3xl space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-clay/20 text-marigold text-xs font-semibold backdrop-blur-md border border-marigold/30">
-            <Sparkles className="w-3.5 h-3.5" /> Mohalla Marketplace & Local Direct
-          </div>
-          <h1 className="font-display text-3xl md:text-5xl text-warmwhite leading-tight">
-            Discover Authentic Mohalla Creators & Daily Essentials
-          </h1>
-          <p className="text-warmwhite/80 text-sm md:text-base font-body leading-relaxed">
-            Fresh kirana groceries, pure dairy, handloom textiles, woodcrafts, tailoring, and doorstep services from verified local sellers with 6-digit OTP delivery security.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          <div className="lg:col-span-8 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-clay/20 text-marigold text-xs font-semibold backdrop-blur-md border border-marigold/30">
+              <Sparkles className="w-3.5 h-3.5" /> Mohalla Marketplace & Local Direct
+            </div>
+            <h1 className="font-display text-3xl md:text-5xl text-warmwhite leading-tight">
+              Discover Authentic Mohalla Creators & Daily Essentials
+            </h1>
+            <p className="text-warmwhite/80 text-sm md:text-base font-body leading-relaxed max-w-2xl">
+              Fresh kirana groceries, pure dairy, handloom textiles, woodcrafts, tailoring, and doorstep services from verified local sellers with 6-digit OTP delivery security.
+            </p>
 
-          {/* Search Bar */}
-          <div className="pt-2 flex items-center gap-2 max-w-xl">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-indigo/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products, artisans, stores, or cities (e.g. Atta, Jaipur, Chai)..."
-                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-ivory text-indigo text-sm placeholder:text-indigo/40 focus:outline-none focus:ring-2 focus:ring-marigold transition-all shadow-md font-body"
+            {/* Search Bar */}
+            <div className="pt-2 flex items-center gap-2 max-w-xl">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-indigo/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products, artisans, stores, or cities (e.g. Atta, Jaipur, Chai)..."
+                  className="w-full pl-10 pr-10 py-3 rounded-2xl bg-ivory text-indigo text-sm placeholder:text-indigo/40 focus:outline-none focus:ring-2 focus:ring-marigold transition-all shadow-md font-body"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo/40 hover:text-indigo p-1"
+                    title="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Hero Right Brand Graphic */}
+          <div className="lg:col-span-4 hidden lg:flex justify-center">
+            <div className="relative p-3 rounded-full bg-warmwhite/10 backdrop-blur-md border border-warmwhite/15 shadow-2xl">
+              <img
+                src="/logo.png"
+                alt="LocalConnect Mohalla Emblem"
+                className="w-44 h-44 rounded-full object-cover shadow-warm ring-4 ring-marigold/30 bg-white"
               />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo/40 hover:text-indigo p-1"
-                  title="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
             </div>
           </div>
         </div>

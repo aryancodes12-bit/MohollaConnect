@@ -59,10 +59,12 @@ export default function AppShell({ children }) {
       <header className="sticky top-0 z-40 bg-ivory/90 backdrop-blur-md border-b border-clay/15 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-clay text-warmwhite flex items-center justify-center font-display text-xl shadow-warm transition-transform group-hover:scale-105">
-              लो
-            </div>
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <img
+              src="/logo.png"
+              alt="LocalConnect"
+              className="w-10 h-10 rounded-xl object-cover shadow-warm border border-clay/20 transition-transform group-hover:scale-105 shrink-0 bg-white"
+            />
             <div>
               <span className="font-display text-2xl text-indigo tracking-tight">LocalConnect</span>
               <span className="block text-[10px] uppercase font-semibold text-clay -mt-1 tracking-widest">
@@ -283,7 +285,12 @@ export default function AppShell({ children }) {
       </main>
 
       {/* Desktop Footer Link */}
-      <footer className="hidden md:block py-6 border-t border-clay/10 text-center text-xs text-indigo/60">
+      <footer className="hidden md:flex items-center justify-center gap-2 py-6 border-t border-clay/10 text-xs text-indigo/60">
+        <img
+          src="/logo.png"
+          alt="LocalConnect"
+          className="w-5 h-5 rounded-full object-cover shrink-0"
+        />
         <span>LocalConnect — Mohalla Marketplace & Community &bull; </span>
         <Link to="/welcome" className="text-clay hover:underline font-semibold">
           What is LocalConnect?

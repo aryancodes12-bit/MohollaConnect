@@ -27,9 +27,11 @@ export default function WelcomeFooter({ onAnchorClick }) {
           {/* Brand Info Column */}
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-clay text-warmwhite flex items-center justify-center font-display text-xl shadow-warm">
-                लो
-              </div>
+              <img
+                src="/logo.png"
+                alt="LocalConnect"
+                className="w-11 h-11 rounded-2xl object-cover shadow-warm border border-marigold/30 shrink-0 bg-white"
+              />
               <div>
                 <span className="font-display text-2xl text-warmwhite tracking-tight block">LocalConnect</span>
                 <span className="text-[10px] uppercase font-semibold text-marigold tracking-widest block -mt-1">

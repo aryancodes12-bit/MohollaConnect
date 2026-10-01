@@ -223,11 +223,24 @@ export default function AuthPage() {
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-marigold/20 rounded-full blur-3xl" />
 
           {/* Top Branding */}
-          <div className="relative z-10 space-y-2">
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.png"
+                alt="LocalConnect Logo"
+                className="w-12 h-12 rounded-2xl object-cover shadow-warm border border-marigold/30 bg-white shrink-0"
+              />
+              <div>
+                <span className="font-display text-xl text-warmwhite tracking-tight block">LocalConnect</span>
+                <span className="text-[10px] uppercase font-semibold text-marigold tracking-widest block -mt-1">
+                  Mohalla Marketplace
+                </span>
+              </div>
+            </div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-warmwhite/10 text-marigold text-xs font-semibold backdrop-blur-md border border-marigold/20">
               <Sparkles className="w-3.5 h-3.5" /> Direct from Artisan Homes
             </div>
-            <h2 className="font-display text-4xl text-warmwhite leading-tight">
+            <h2 className="font-display text-3xl xl:text-4xl text-warmwhite leading-tight">
               सीधे कारीगरों से आपके घर तक
             </h2>
           </div>
@@ -260,6 +273,21 @@ export default function AuthPage() {
         {/* Right Panel — Interactive Auth Form */}
         <div className="lg:col-span-7 p-6 sm:p-8 md:p-10 flex flex-col justify-center space-y-6">
           
+          {/* Mobile Brand Logo Header */}
+          <div className="flex lg:hidden items-center gap-2.5 pb-2">
+            <img
+              src="/logo.png"
+              alt="LocalConnect"
+              className="w-9 h-9 rounded-xl object-cover shadow-warm border border-clay/20 bg-white"
+            />
+            <div>
+              <span className="font-display text-xl text-indigo tracking-tight">LocalConnect</span>
+              <span className="block text-[9px] uppercase font-semibold text-clay -mt-1 tracking-widest">
+                Mohalla Marketplace
+              </span>
+            </div>
+          </div>
+
           {/* Mode Switch Tabs */}
           <div className="flex items-center justify-between border-b border-clay/15 pb-4">
             <div>

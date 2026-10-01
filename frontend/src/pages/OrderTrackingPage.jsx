@@ -286,7 +286,8 @@ export default function OrderTrackingPage() {
           <div className="rounded-3xl bg-indigo text-warmwhite p-6 sm:p-8 jali-bg relative overflow-hidden shadow-warm space-y-6">
             <div className="relative z-10 flex items-center justify-between">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-warmwhite/10 text-marigold text-xs font-semibold border border-marigold/20">
-                <ShieldCheck className="w-4 h-4" /> 6-Digit Delivery OTP
+                <img src="/logo.png" alt="LocalConnect" className="w-4 h-4 rounded-full object-cover" />
+                <span>LocalConnect 6-Digit Delivery OTP</span>
               </div>
               <span className="text-xs text-warmwhite/70">Encrypted Handover</span>
             </div>

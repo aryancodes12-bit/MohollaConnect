@@ -126,9 +126,11 @@ export default function ChatWidget() {
           {/* Window Header */}
           <div className="relative z-10 px-5 py-4 border-b border-white/10 bg-indigo/80 backdrop-blur-md flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-clay to-marigold flex items-center justify-center text-warmwhite shadow-warm">
-                <Sparkles className="w-5 h-5 fill-warmwhite/20" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="LocalConnect Saathi"
+                className="w-9 h-9 rounded-2xl object-cover shadow-warm border border-marigold/30 shrink-0 bg-white"
+              />
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-display text-sm font-bold text-warmwhite tracking-wide">
@@ -180,8 +182,15 @@ export default function ChatWidget() {
           <div className="relative z-10 flex-1 overflow-y-auto p-4 space-y-3.5 custom-scrollbar text-xs sm:text-sm">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-center items-center text-center p-6 space-y-4 text-warmwhite/80">
-                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-marigold shadow-inner">
-                  <ShieldCheck className="w-6 h-6" />
+                <div className="relative">
+                  <img
+                    src="/logo.png"
+                    alt="LocalConnect Saathi"
+                    className="w-16 h-16 rounded-3xl object-cover shadow-warm border-2 border-marigold/40 bg-white"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-neem text-warmwhite flex items-center justify-center text-[10px] font-bold shadow">
+                    ✓
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <h4 className="font-display text-base text-warmwhite font-bold">
@@ -264,7 +273,8 @@ export default function ChatWidget() {
                         </div>
                       )}
                     </div>
-                    <span className="text-[10px] text-warmwhite/50 px-1">
+                    <span className="text-[10px] text-warmwhite/60 px-1 flex items-center gap-1">
+                      {!isUser && <img src="/logo.png" alt="" className="w-3.5 h-3.5 rounded-full object-cover inline-block" />}
                       {isUser ? 'You' : 'Saathi AI'}
                     </span>
                   </div>
@@ -334,8 +344,8 @@ export default function ChatWidget() {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warmwhite opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-warmwhite"></span>
         </span>
-        <div className="flex items-center gap-1.5">
-          <MessageSquare className="w-4 h-4 stroke-[2.5]" />
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="Saathi" className="w-5 h-5 rounded-full object-cover ring-1 ring-white/40" />
           <span className="text-xs sm:text-sm tracking-wide">Saathi AI</span>
         </div>
       </button>
