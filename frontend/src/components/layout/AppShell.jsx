@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import Toast from '../Toast';
+import ChatWidget from '../ChatWidget';
 
 export default function AppShell({ children }) {
   const { user, logout } = useAuth();
@@ -175,29 +176,41 @@ export default function AppShell({ children }) {
               </NavLink>
             )}
             {user && isAdmin && (
-              <>
+              <div className="flex items-center gap-1 bg-indigo/5 border border-clay/15 rounded-2xl p-1">
                 <NavLink
-                  to="/admin/sellers"
+                  to="/admin/users"
                   className={({ isActive }) =>
-                    `px-3.5 py-2 rounded-xl text-sm font-bold transition-all text-marigold bg-indigo/90 hover:bg-indigo ${
-                      isActive ? 'ring-2 ring-marigold' : ''
+                    `px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      isActive ? 'bg-clay text-warmwhite shadow-xs' : 'text-indigo/80 hover:text-indigo hover:bg-clay/10'
                     }`
                   }
                 >
+                  <Users className="w-3.5 h-3.5 text-clay" />
+                  User Directory
+                </NavLink>
+                <NavLink
+                  to="/admin/sellers"
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      isActive ? 'bg-indigo text-warmwhite shadow-xs' : 'text-indigo/80 hover:text-indigo hover:bg-clay/10'
+                    }`
+                  }
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-marigold" />
                   Approval Queue
                 </NavLink>
                 <NavLink
                   to="/admin/bi-dashboard"
                   className={({ isActive }) =>
-                    `px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 text-warmwhite bg-clay hover:bg-clay/90 ${
-                      isActive ? 'ring-2 ring-clay/50' : ''
+                    `px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      isActive ? 'bg-marigold text-indigo shadow-xs' : 'text-indigo/80 hover:text-indigo hover:bg-clay/10'
                     }`
                   }
                 >
-                  <BarChart3 className="w-3.5 h-3.5" />
+                  <BarChart3 className="w-3.5 h-3.5 text-clay" />
                   BI Dashboard
                 </NavLink>
-              </>
+              </div>
             )}
             <NavLink
               to="/welcome"
@@ -309,6 +322,9 @@ export default function AppShell({ children }) {
 
       {/* Global Toast Component */}
       <Toast />
+
+      {/* Global AI Chat Support Widget */}
+      <ChatWidget />
     </div>
   );
 }
