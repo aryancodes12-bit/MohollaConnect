@@ -356,9 +356,11 @@ export default function WelcomePage() {
             }}
             className="flex items-center gap-2 shrink-0 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-clay text-warmwhite flex items-center justify-center font-display text-lg shadow-warm transition-transform group-hover:scale-105">
-              लो
-            </div>
+            <img
+              src="/logo.png"
+              alt="LocalConnect"
+              className="w-9 h-9 rounded-xl object-cover shadow-warm border border-clay/20 transition-transform group-hover:scale-105 shrink-0 bg-white"
+            />
             <div className="hidden sm:block">
               <span className="font-display text-xl text-indigo tracking-tight">LocalConnect</span>
               <span className="block text-[10px] uppercase font-semibold text-clay -mt-1 tracking-widest">
@@ -415,33 +417,58 @@ export default function WelcomePage() {
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-clay/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-marigold/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl space-y-6">
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warmwhite/10 text-marigold text-xs font-semibold backdrop-blur-md border border-marigold/20">
-              <Sparkles className="w-4 h-4 text-marigold shrink-0" />
-              <span>Social Commerce for Local Sellers & Neighborhoods</span>
-            </motion.div>
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-6">
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warmwhite/10 text-marigold text-xs font-semibold backdrop-blur-md border border-marigold/20">
+                <Sparkles className="w-4 h-4 text-marigold shrink-0" />
+                <span>Social Commerce for Local Sellers & Neighborhoods</span>
+              </motion.div>
 
-            <motion.h1 variants={itemVariants} className="font-display text-4xl sm:text-5xl md:text-6xl text-warmwhite leading-tight">
-              आपका मोहल्ला, आपकी दुकान — Local Artisan Heritage in Your Pocket
-            </motion.h1>
+              <motion.h1 variants={itemVariants} className="font-display text-4xl sm:text-5xl md:text-6xl text-warmwhite leading-tight">
+                आपका मोहल्ला, आपकी दुकान — Local Artisan Heritage in Your Pocket
+              </motion.h1>
 
-            <motion.p variants={itemVariants} className="font-body text-base sm:text-lg text-warmwhite/85 leading-relaxed max-w-2xl">
-              Discover Saharanpur woodworkers, Jaipur block printers, and Kerala spice growers right in your city. Direct connections, zero corporate markups, and OTP-secured neighborhood delivery.
-            </motion.p>
+              <motion.p variants={itemVariants} className="font-body text-base sm:text-lg text-warmwhite/85 leading-relaxed max-w-2xl">
+                Discover Saharanpur woodworkers, Jaipur block printers, and Kerala spice growers right in your city. Direct connections, zero corporate markups, and OTP-secured neighborhood delivery.
+              </motion.p>
 
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <button
-                onClick={handleGetStarted}
-                className="px-7 py-3.5 rounded-xl bg-clay hover:bg-saffron text-warmwhite font-display text-lg transition-all shadow-warm flex items-center justify-center gap-2 group"
-              >
-                Get Started <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </button>
-              <button
-                onClick={handleExploreGuest}
-                className="px-7 py-3.5 rounded-xl bg-warmwhite/10 hover:bg-warmwhite/20 text-warmwhite font-medium text-sm border border-warmwhite/20 transition-all flex items-center justify-center gap-2"
-              >
-                <Compass className="w-4 h-4 text-marigold" /> Explore as Guest
-              </button>
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                <button
+                  onClick={handleGetStarted}
+                  className="px-7 py-3.5 rounded-xl bg-clay hover:bg-saffron text-warmwhite font-display text-lg transition-all shadow-warm flex items-center justify-center gap-2 group"
+                >
+                  Get Started <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </button>
+                <button
+                  onClick={handleExploreGuest}
+                  className="px-7 py-3.5 rounded-xl bg-warmwhite/10 hover:bg-warmwhite/20 text-warmwhite font-medium text-sm border border-warmwhite/20 transition-all flex items-center justify-center gap-2"
+                >
+                  <Compass className="w-4 h-4 text-marigold" /> Explore as Guest
+                </button>
+              </motion.div>
+            </div>
+
+            {/* Official Logo Showcase Emblem */}
+            <motion.div
+              variants={itemVariants}
+              className="lg:col-span-4 hidden lg:flex flex-col items-center justify-center p-6 rounded-3xl bg-warmwhite/5 backdrop-blur-md border border-warmwhite/10 shadow-2xl text-center space-y-3"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-1.5 bg-gradient-to-r from-clay via-marigold to-neem rounded-full blur-md opacity-50 group-hover:opacity-80 transition duration-500"></div>
+                <img
+                  src="/logo.png"
+                  alt="Official LocalConnect Logo"
+                  className="relative w-48 h-48 rounded-full object-cover shadow-2xl ring-4 ring-marigold/40 bg-white"
+                />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[11px] uppercase font-mono tracking-widest text-marigold font-bold block">
+                  Official Community Emblem
+                </span>
+                <p className="text-xs text-warmwhite/70">
+                  Trust &bull; Heritage &bull; Direct Mohalla Commerce
+                </p>
+              </div>
             </motion.div>
           </div>
         </motion.div>

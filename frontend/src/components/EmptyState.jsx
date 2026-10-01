@@ -46,7 +46,7 @@ export default function EmptyState({
         };
       default:
         return {
-          icon: <Sparkles className="w-12 h-12 text-clay stroke-[1.5]" />,
+          icon: <img src="/logo.png" alt="LocalConnect" className="w-12 h-12 rounded-full object-cover shadow-warm" />,
           defaultTitle: 'Nothing Here Yet',
           defaultDesc: 'Check back soon for new local updates and handcrafted additions.',
           cta: 'Go to Home',

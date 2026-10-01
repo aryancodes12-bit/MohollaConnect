@@ -377,12 +377,12 @@ export default function CheckoutPage() {
                   <span className="text-xs bg-clay/30 px-2 py-0.5 rounded text-warmwhite font-mono">Mock Mode</span>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl">
-                  <div className="w-12 h-12 rounded-lg bg-white p-1 flex items-center justify-center shrink-0">
-                    <QrCode className="w-10 h-10 text-indigo" />
+                <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-white p-0.5 flex items-center justify-center shrink-0 shadow">
+                    <img src="/logo.png" alt="LocalConnect UPI" className="w-full h-full rounded-lg object-cover" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="text-xs text-warmwhite/70">LocalConnect Virtual UPI ID</span>
+                    <span className="text-xs text-warmwhite/70">LocalConnect Verified Mohalla Gateway</span>
                     <p className="font-mono text-sm font-bold text-warmwhite">localconnect.mohalla@upi</p>
                   </div>
                 </div>

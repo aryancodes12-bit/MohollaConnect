@@ -99,7 +99,8 @@ export default function AdminSellerQueuePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-clay/20 pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-clay font-bold text-xs uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4" /> Mohalla Marketplace Governance
+            <img src="/logo.png" alt="LocalConnect" className="w-4 h-4 rounded-full object-cover" />
+            <span>Mohalla Marketplace Governance</span>
           </div>
           <h1 className="text-3xl font-display text-indigo flex items-center gap-2">
             Seller Approval Queue
