@@ -11,6 +11,7 @@ public class StoreResponse {
     private Long id;
     private Long ownerId;
     private String ownerName;
+    private String ownerEmail;
     private String storeName;
     private String location;
     private String category;

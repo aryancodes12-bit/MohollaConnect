@@ -159,6 +159,7 @@ public class StoreService {
                 .id(store.getId())
                 .ownerId(store.getOwner().getId())
                 .ownerName(store.getOwner().getName())
+                .ownerEmail(store.getOwner() != null ? store.getOwner().getEmail() : null)
                 .storeName(store.getStoreName())
                 .location(store.getLocation())
                 .category(store.getCategory())

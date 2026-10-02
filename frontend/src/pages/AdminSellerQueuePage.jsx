@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { sendStoreApprovedEmail } from '../services/emailService';
 
 export default function AdminSellerQueuePage() {
   const { showToast } = useToast();
@@ -48,11 +49,34 @@ export default function AdminSellerQueuePage() {
   };
 
   const handleApprove = async (storeId) => {
+    const storeToApprove = stores.find((s) => s.id === storeId);
     setProcessingId(storeId);
     try {
-      await api.put(`/stores/${storeId}/approve`);
+      const res = await api.put(`/stores/${storeId}/approve`);
+      const approvedStore = res.data || storeToApprove || {};
+
       showToast('Store approved and seller promoted to SELLER role!', 'success');
       setStores((prev) => prev.filter((s) => s.id !== storeId));
+
+      // Trigger Store Approved EmailJS notification
+      const sellerEmail = approvedStore.ownerEmail || storeToApprove?.ownerEmail;
+      if (sellerEmail) {
+        sendStoreApprovedEmail({
+          toEmail: sellerEmail,
+          toName: approvedStore.ownerName || storeToApprove?.ownerName || 'Artisan Seller',
+          storeName: approvedStore.storeName || storeToApprove?.storeName || 'Your Mohalla Store',
+          dashboardLink: `${window.location.origin}/dashboard`,
+        }).then((emailRes) => {
+          if (emailRes.success) {
+            showToast(`Store approval email sent to seller (${sellerEmail})`, 'info');
+          } else {
+            console.warn('EmailJS Store Approved Notice:', emailRes.error);
+            showToast('Store approved, but could not send notification email to seller', 'warning');
+          }
+        }).catch((err) => {
+          console.warn('EmailJS unexpected error:', err);
+        });
+      }
     } catch (err) {
       console.error('Failed to approve store:', err);
       showToast(err.response?.data?.message || 'Failed to approve store', 'error');

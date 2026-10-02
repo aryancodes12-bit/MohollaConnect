@@ -14,6 +14,7 @@ public class OrderResponse {
     private Long id;
     private Long buyerId;
     private String buyerName;
+    private String buyerEmail;
     private Long productId;
     private String productTitle;
     private BigDecimal unitPrice;
