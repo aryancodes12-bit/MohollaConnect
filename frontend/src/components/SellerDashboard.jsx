@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, Package, Store, RefreshCw, TrendingUp } from 'lucide-react';
 import api from '../services/api';
-import { sendOtpEmail } from '../services/emailService';
+import { sendOtpEmail, sendOrderDeliveredEmail } from '../services/emailService';
 import { useAuth } from '../context/AuthContext';
 import Toast from './Toast';
 
@@ -86,13 +86,44 @@ const SellerDashboard = ({ storeId }) => {
     }
 
     try {
-      await api.post(`/orders/${orderId}/verify-otp`, { otp: otp.trim() });
+      const res = await api.post(`/orders/${orderId}/verify-otp`, { otp: otp.trim() });
+      const deliveredOrder = res.data || orders.find((o) => o.id === orderId) || {};
+
       setToast({
         message: `Order #${orderId} verified & updated to DELIVERED!`,
         type: 'success',
       });
       setOtpInputs((prev) => ({ ...prev, [orderId]: '' }));
       fetchOrders();
+
+      // Trigger Order Delivered EmailJS notification to Buyer
+      const targetBuyerEmail = deliveredOrder.buyerEmail || orders.find((o) => o.id === orderId)?.buyerEmail;
+      if (targetBuyerEmail) {
+        sendOrderDeliveredEmail({
+          toEmail: targetBuyerEmail,
+          toName: deliveredOrder.buyerName || deliveredOrder.customerName || 'Valued Customer',
+          orderId: orderId,
+          productTitle: deliveredOrder.productTitle,
+          reviewLink: deliveredOrder.productId 
+            ? `${window.location.origin}/products/${deliveredOrder.productId}/review`
+            : `${window.location.origin}/orders/${orderId}`,
+        }).then((emailRes) => {
+          if (emailRes.success) {
+            setToast({
+              message: `Delivery receipt & review link emailed to ${targetBuyerEmail}!`,
+              type: 'info',
+            });
+          } else {
+            console.warn('EmailJS Order Delivered Notice:', emailRes.error);
+            setToast({
+              message: `Order delivered, but could not send receipt email: ${emailRes.error}`,
+              type: 'warning',
+            });
+          }
+        }).catch((err) => {
+          console.warn('EmailJS unexpected error:', err);
+        });
+      }
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to verify OTP';
       setToast({ message: msg, type: 'error' });

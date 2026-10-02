@@ -23,6 +23,7 @@ import {
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { sendOrderDeliveredEmail } from '../services/emailService';
 
 const TIMELINE_STEPS = [
   {
@@ -110,10 +111,33 @@ export default function OrderTrackingPage() {
 
     setIsVerifying(true);
     try {
-      await api.post(`/orders/${orderId}/verify-otp`, { otp: sellerOtpInput.trim() });
+      const res = await api.post(`/orders/${orderId}/verify-otp`, { otp: sellerOtpInput.trim() });
       toast.success('OTP verified! Package successfully marked as DELIVERED.');
       setSellerOtpInput('');
       fetchOrder();
+
+      const deliveredData = res.data || order || {};
+      const buyerMail = deliveredData.buyerEmail || order?.buyerEmail;
+      if (buyerMail) {
+        sendOrderDeliveredEmail({
+          toEmail: buyerMail,
+          toName: deliveredData.buyerName || deliveredData.customerName || order?.buyerName || 'Valued Customer',
+          orderId: orderId,
+          productTitle: deliveredData.productTitle || order?.productTitle,
+          reviewLink: deliveredData.productId || order?.productId
+            ? `${window.location.origin}/products/${deliveredData.productId || order?.productId}/review`
+            : `${window.location.origin}/orders/${orderId}`,
+        }).then((emailRes) => {
+          if (emailRes.success) {
+            toast.info(`Delivery confirmation & review link emailed to ${buyerMail}`);
+          } else {
+            console.warn('EmailJS Order Delivered Notice:', emailRes.error);
+            toast.warning('Order delivered, but could not send receipt email to buyer');
+          }
+        }).catch((err) => {
+          console.warn('EmailJS unexpected error:', err);
+        });
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Invalid or expired OTP. Please try again.');
     } finally {

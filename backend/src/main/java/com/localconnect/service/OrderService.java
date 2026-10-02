@@ -300,6 +300,7 @@ public class OrderService {
                 .id(order.getId())
                 .buyerId(order.getBuyer().getId())
                 .buyerName(order.getBuyer().getName())
+                .buyerEmail(order.getBuyer() != null ? order.getBuyer().getEmail() : null)
                 .productId(order.getProduct().getId())
                 .productTitle(order.getProduct().getTitle())
                 .unitPrice(order.getProduct().getPrice())

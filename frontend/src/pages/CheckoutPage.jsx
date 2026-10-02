@@ -18,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import LocationPicker from '../components/LocationPicker';
+import { sendOrderPlacedEmail } from '../services/emailService';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -103,6 +104,36 @@ export default function CheckoutPage() {
       setPlacedOrders(createdOrders);
       setCurrentStep(4);
       showToast(`Successfully placed ${createdOrders.length} order(s) under single checkout group!`, 'success');
+
+      // Trigger Order Placed EmailJS notification
+      const recipientEmail = user?.email || createdOrders[0]?.buyerEmail;
+      if (recipientEmail) {
+        const orderIdentifier = createdOrders[0]?.checkoutGroupId || `#${createdOrders.map(o => o.id).join(', #')}`;
+        const totalPlaced = createdOrders.reduce((sum, o) => sum + (Number(o.totalPrice) || 0), 0);
+        
+        sendOrderPlacedEmail({
+          toEmail: recipientEmail,
+          toName: address.name || user?.name || 'Valued Customer',
+          orderId: orderIdentifier,
+          items: createdOrders.map(o => ({
+            title: o.productTitle,
+            quantity: o.quantity,
+            price: o.totalPrice,
+          })),
+          totalAmount: totalPlaced,
+          deliveryAddress: fullAddress,
+          trackingLink: `${window.location.origin}/orders`,
+        }).then((emailRes) => {
+          if (emailRes.success) {
+            showToast(`Order confirmation email sent to ${recipientEmail}`, 'info');
+          } else {
+            console.warn('EmailJS Order Placed Notice:', emailRes.error);
+            showToast("Order placed successfully, but we couldn't send the confirmation email", 'warning');
+          }
+        }).catch((err) => {
+          console.warn('EmailJS unexpected error:', err);
+        });
+      }
     } catch (err) {
       console.error('Failed to place order:', err);
       showToast(err.response?.data?.message || 'Failed to place order. Please try again.', 'error');
