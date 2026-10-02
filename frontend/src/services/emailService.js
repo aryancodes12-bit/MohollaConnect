@@ -9,13 +9,17 @@ const TEMPLATE_ORDER_PLACED = import.meta.env.VITE_EMAILJS_TEMPLATE_ORDER_PLACED
 const TEMPLATE_ORDER_DELIVERED = import.meta.env.VITE_EMAILJS_TEMPLATE_ORDER_DELIVERED || 'template_order_delivered';
 const TEMPLATE_STORE_APPROVED = import.meta.env.VITE_EMAILJS_TEMPLATE_STORE_APPROVED || 'template_store_approved';
 
+// Multi-Account Support (Account 2 for Store Approved)
+const STORE_APPROVED_SERVICE_ID = import.meta.env.VITE_EMAILJS_STORE_APPROVED_SERVICE_ID || SERVICE_ID;
+const STORE_APPROVED_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_STORE_APPROVED_PUBLIC_KEY || PUBLIC_KEY;
+
 /**
  * Helper to determine whether real EmailJS credentials have been supplied by the user,
  * or if the client should gracefully simulate/mock the email in development/demo mode.
  */
-const isEmailJsConfigured = (templateId) => {
-  const isKeyReal = PUBLIC_KEY && PUBLIC_KEY.trim() !== '' && PUBLIC_KEY !== 'user_public_key_example';
-  const isServiceReal = SERVICE_ID && SERVICE_ID.trim() !== '' && SERVICE_ID !== 'service_localconnect';
+const isEmailJsConfigured = (templateId, pubKey = PUBLIC_KEY, srvId = SERVICE_ID) => {
+  const isKeyReal = pubKey && pubKey.trim() !== '' && pubKey !== 'user_public_key_example';
+  const isServiceReal = srvId && srvId.trim() !== '' && srvId !== 'service_localconnect';
   const isTemplateReal = templateId && templateId.trim() !== '' && !templateId.startsWith('template_example');
   return Boolean(isKeyReal && isServiceReal && isTemplateReal);
 };
@@ -218,7 +222,7 @@ export const sendStoreApprovedEmail = async ({
     dashboard_link: defaultDashboardLink,
   };
 
-  if (!isEmailJsConfigured(TEMPLATE_STORE_APPROVED)) {
+  if (!isEmailJsConfigured(TEMPLATE_STORE_APPROVED, STORE_APPROVED_PUBLIC_KEY, STORE_APPROVED_SERVICE_ID)) {
     console.info(`[EmailJS Mock] 🏪 Store Approved Email to ${toEmail}:`, templateParams);
     return {
       success: true,
@@ -229,10 +233,10 @@ export const sendStoreApprovedEmail = async ({
 
   try {
     const response = await emailjs.send(
-      SERVICE_ID,
+      STORE_APPROVED_SERVICE_ID,
       TEMPLATE_STORE_APPROVED,
       templateParams,
-      PUBLIC_KEY
+      STORE_APPROVED_PUBLIC_KEY
     );
 
     return {
