@@ -15,6 +15,8 @@ import {
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import ProductImage from '../components/ProductImage';
+import ProductImageUploader from '../components/ProductImageUploader';
 
 export default function SellerProductsPage() {
   const { user } = useAuth();
@@ -35,6 +37,7 @@ export default function SellerProductsPage() {
     description: '',
     price: '',
     stockQty: '',
+    imageUrl: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -69,7 +72,7 @@ export default function SellerProductsPage() {
   const openAddModal = () => {
     setIsEditing(false);
     setSelectedProduct(null);
-    setForm({ title: '', description: '', price: '', stockQty: '10' });
+    setForm({ title: '', description: '', price: '', stockQty: '10', imageUrl: '' });
     setIsModalOpen(true);
   };
 
@@ -81,6 +84,7 @@ export default function SellerProductsPage() {
       description: p.description || '',
       price: p.price,
       stockQty: p.stockQty,
+      imageUrl: p.imageUrl || '',
     });
     setIsModalOpen(true);
   };
@@ -100,6 +104,7 @@ export default function SellerProductsPage() {
         description: form.description,
         price: parseFloat(form.price),
         stockQty: parseInt(form.stockQty, 10),
+        imageUrl: form.imageUrl || null,
       };
 
       if (isEditing && selectedProduct) {
@@ -223,8 +228,19 @@ export default function SellerProductsPage() {
           {products.map((p) => (
             <div
               key={p.id}
-              className="bg-warmwhite rounded-2xl border border-clay/20 shadow-warm p-6 flex flex-col justify-between space-y-4 hover:shadow-lg transition-all"
+              className="bg-warmwhite rounded-2xl border border-clay/20 shadow-warm p-5 flex flex-col justify-between space-y-3 hover:shadow-lg transition-all"
             >
+              {/* Product Thumbnail Image */}
+              <div className="w-full h-44 rounded-xl overflow-hidden">
+                <ProductImage
+                  src={p.imageUrl}
+                  alt={p.title}
+                  category={store?.category || 'HANDICRAFTS'}
+                  aspectClass="h-full w-full"
+                  marketFrame={true}
+                />
+              </div>
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-clay/10 text-clay font-bold">
@@ -275,7 +291,7 @@ export default function SellerProductsPage() {
       {/* Add / Edit Product Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-warmwhite w-full max-w-lg rounded-3xl border border-clay/30 shadow-2xl p-6 md:p-8 space-y-6 relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-warmwhite w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-clay/30 shadow-2xl p-6 md:p-8 space-y-5 relative animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-clay/10 pb-4">
               <h3 className="font-display text-2xl text-indigo flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-clay" />
@@ -291,6 +307,12 @@ export default function SellerProductsPage() {
             </div>
 
             <form onSubmit={handleSaveProduct} className="space-y-4">
+              {/* Product Picture Upload Section */}
+              <ProductImageUploader
+                value={form.imageUrl}
+                onChange={(url) => setForm({ ...form, imageUrl: url })}
+              />
+
               <div className="space-y-1">
                 <label className="text-xs font-bold text-indigo">Product Title</label>
                 <input

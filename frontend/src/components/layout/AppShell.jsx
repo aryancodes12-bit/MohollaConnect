@@ -96,6 +96,16 @@ export default function AppShell({ children }) {
               <MapPin className="w-3.5 h-3.5 text-clay" />
               Bazaar Map
             </NavLink>
+            <NavLink
+              to="/pricing"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  isActive ? 'bg-clay/10 text-clay font-semibold' : 'text-indigo/80 hover:bg-clay/5 hover:text-indigo'
+                }`
+              }
+            >
+              Pricing
+            </NavLink>
             {user && (
               <NavLink
                 to="/community"

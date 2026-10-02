@@ -13,13 +13,15 @@ import {
   MessageSquare,
   Sparkles,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import ProductImage from '../components/ProductImage';
+import QuickOrderModal from '../components/booking/QuickOrderModal';
 
 export default function ProductDetailPage() {
   const { productId } = useParams();
@@ -34,6 +36,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [hasDeliveredOrder, setHasDeliveredOrder] = useState(false);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
+  const [showQuickOrder, setShowQuickOrder] = useState(false);
 
   useEffect(() => {
     fetchProductAndReviews();
@@ -296,14 +299,11 @@ export default function ProductDetailPage() {
 
               <button
                 type="button"
-                onClick={() => {
-                  handleAddToCart();
-                  navigate('/checkout');
-                }}
+                onClick={() => setShowQuickOrder(true)}
                 disabled={product.stockQty <= 0}
                 className="w-full py-3.5 px-6 rounded-xl bg-indigo hover:bg-deepdark disabled:bg-gray-300 disabled:cursor-not-allowed text-warmwhite font-bold text-sm transition-all shadow-warm flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Truck className="w-4 h-4 text-marigold" /> Buy Now
+                <Zap className="w-4 h-4 text-marigold" /> Buy Now (UPI / Razorpay)
               </button>
             </div>
 
@@ -406,6 +406,16 @@ export default function ProductDetailPage() {
           <ShoppingBag className="w-4 h-4" /> Add to Cart
         </button>
       </div>
+
+      {/* Quick Order Modal with Booking Animation */}
+      {product && (
+        <QuickOrderModal
+          product={product}
+          isOpen={showQuickOrder}
+          onClose={() => setShowQuickOrder(false)}
+          onSuccess={() => setShowQuickOrder(false)}
+        />
+      )}
     </div>
   );
 }

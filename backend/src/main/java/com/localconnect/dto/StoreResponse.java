@@ -20,5 +20,10 @@ public class StoreResponse {
     private String rejectionReason;
     private Double latitude;
     private Double longitude;
+    private String subscriptionPlan;
+    private String subscriptionStatus;
+    private String subscriptionPaymentId;
+    private Double subscriptionAmount;
+    private java.time.LocalDateTime subscriptionDate;
     private java.time.LocalDateTime createdAt;
 }

@@ -6,6 +6,8 @@ import com.localconnect.entity.Product;
 import com.localconnect.entity.Review;
 import com.localconnect.entity.Role;
 import com.localconnect.entity.User;
+import com.localconnect.entity.Order;
+import com.localconnect.repository.OrderRepository;
 import com.localconnect.repository.ProductRepository;
 import com.localconnect.repository.ReviewRepository;
 import com.localconnect.repository.UserRepository;
@@ -17,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,6 +37,9 @@ class ReviewServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private OrderRepository orderRepository;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -55,6 +61,13 @@ class ReviewServiceTest {
                 .commentText("Smells amazing and lasts long!")
                 .build();
 
+        Order deliveredOrder = Order.builder()
+                .id(1L)
+                .buyer(reviewer)
+                .product(product)
+                .status("DELIVERED")
+                .build();
+
         Review savedReview = Review.builder()
                 .id(20L)
                 .product(product)
@@ -66,6 +79,7 @@ class ReviewServiceTest {
 
         when(userRepository.findById(5L)).thenReturn(Optional.of(reviewer));
         when(productRepository.findById(100L)).thenReturn(Optional.of(product));
+        when(orderRepository.findByBuyerId(5L)).thenReturn(List.of(deliveredOrder));
         when(reviewRepository.save(any(Review.class))).thenReturn(savedReview);
 
         ReviewResponse response = reviewService.createReview(5L, request);

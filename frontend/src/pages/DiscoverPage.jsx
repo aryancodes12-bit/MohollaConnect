@@ -14,13 +14,15 @@ import {
   Filter,
   CheckCircle2,
   RotateCcw,
-  Navigation
+  Navigation,
+  Zap
 } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import ProductImage from '../components/ProductImage';
 import { calculateHaversineDistance } from '../utils/geoUtils';
+import QuickOrderModal from '../components/booking/QuickOrderModal';
 
 // Friendly category display names & mapping to backend categories
 const CATEGORY_MAP = [
@@ -56,6 +58,7 @@ export default function DiscoverPage() {
 
   // UI state
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quickOrderProduct, setQuickOrderProduct] = useState(null);
   const [addedIds, setAddedIds] = useState([]);
   const [showFiltersPanel, setShowFiltersPanel] = useState(false);
 
@@ -689,32 +692,61 @@ export default function DiscoverPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
                 <button
-                  onClick={(e) => {
-                    handleAddToCart(selectedProduct, e);
+                  type="button"
+                  onClick={() => {
+                    setQuickOrderProduct(selectedProduct);
                     setSelectedProduct(null);
                   }}
                   disabled={selectedProduct.stockQty <= 0}
-                  className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all shadow-warm flex items-center justify-center gap-2 cursor-pointer ${
+                  className={`w-full sm:flex-1 py-3 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-warm flex items-center justify-center gap-1.5 cursor-pointer ${
                     selectedProduct.stockQty <= 0
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       : 'bg-clay hover:bg-saffron text-warmwhite'
                   }`}
                 >
-                  <ShoppingBag className="w-4 h-4" /> Add to Cart
+                  <Zap className="w-4 h-4 fill-warmwhite" /> Quick Buy (UPI / Razorpay)
                 </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    handleAddToCart(selectedProduct, e);
+                    setSelectedProduct(null);
+                  }}
+                  disabled={selectedProduct.stockQty <= 0}
+                  className={`w-full sm:w-auto py-3 px-4 rounded-xl font-semibold text-xs transition-all border border-clay/20 flex items-center justify-center gap-1.5 cursor-pointer ${
+                    selectedProduct.stockQty <= 0
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-warmwhite hover:bg-white text-indigo'
+                  }`}
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" /> Add to Cart
+                </button>
+
                 <a
                   href={`/products/${selectedProduct.id}`}
-                  className="px-4 py-3 rounded-xl bg-indigo hover:bg-deepdark text-warmwhite text-xs font-semibold transition-all text-center"
+                  className="w-full sm:w-auto px-4 py-3 rounded-xl bg-indigo hover:bg-deepdark text-warmwhite text-xs font-semibold transition-all text-center"
                 >
-                  Full Page →
+                  Details →
                 </a>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* Quick Order Modal with Booking Animation */}
+      {quickOrderProduct && (
+        <QuickOrderModal
+          product={quickOrderProduct}
+          isOpen={Boolean(quickOrderProduct)}
+          onClose={() => setQuickOrderProduct(null)}
+          onSuccess={() => setQuickOrderProduct(null)}
+        />
+      )}
     </div>
   );
+
 }

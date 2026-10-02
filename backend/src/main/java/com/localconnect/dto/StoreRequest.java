@@ -24,4 +24,12 @@ public class StoreRequest {
     private Double latitude;
 
     private Double longitude;
+
+    private String subscriptionPlan;
+
+    private String subscriptionStatus;
+
+    private String subscriptionPaymentId;
+
+    private Double subscriptionAmount;
 }

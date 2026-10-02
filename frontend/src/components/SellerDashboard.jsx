@@ -22,9 +22,20 @@ const SellerDashboard = ({ storeId }) => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const endpoint = storeId ? `/orders/store/${storeId}` : '/orders';
+      let targetStoreId = storeId;
+      if (!targetStoreId && user?.id) {
+        try {
+          const storeRes = await api.get(`/stores/owner/${user.id}`);
+          if (storeRes.data?.id) {
+            targetStoreId = storeRes.data.id;
+          }
+        } catch (e) {
+          console.warn('Could not load owner store:', e);
+        }
+      }
+      const endpoint = targetStoreId ? `/orders/store/${targetStoreId}` : '/orders';
       const res = await api.get(endpoint);
-      setOrders(res.data);
+      setOrders(res.data || []);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
       setToast({
@@ -38,7 +49,7 @@ const SellerDashboard = ({ storeId }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, [storeId]);
+  }, [storeId, user?.id]);
 
   const handleGenerateOtp = async (order) => {
     try {

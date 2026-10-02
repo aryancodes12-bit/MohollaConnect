@@ -37,6 +37,16 @@ public class StoreService {
 
         String initialStatus = owner.getRole() == Role.ADMIN ? "APPROVED" : "PENDING";
 
+        String plan = request.getSubscriptionPlan() != null && !request.getSubscriptionPlan().isBlank()
+                ? request.getSubscriptionPlan()
+                : "ARTISAN_PRO";
+        String subStatus = request.getSubscriptionStatus() != null && !request.getSubscriptionStatus().isBlank()
+                ? request.getSubscriptionStatus()
+                : "PAID";
+        Double amount = request.getSubscriptionAmount() != null
+                ? request.getSubscriptionAmount()
+                : 499.0;
+
         Store store = Store.builder()
                 .owner(owner)
                 .storeName(request.getStoreName())
@@ -46,6 +56,11 @@ public class StoreService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .status(initialStatus)
+                .subscriptionPlan(plan)
+                .subscriptionStatus(subStatus)
+                .subscriptionPaymentId(request.getSubscriptionPaymentId())
+                .subscriptionAmount(amount)
+                .subscriptionDate(java.time.LocalDateTime.now())
                 .build();
 
         Store savedStore = storeRepository.save(store);
@@ -98,6 +113,18 @@ public class StoreService {
         }
         if (request.getLongitude() != null) {
             store.setLongitude(request.getLongitude());
+        }
+        if (request.getSubscriptionPlan() != null) {
+            store.setSubscriptionPlan(request.getSubscriptionPlan());
+        }
+        if (request.getSubscriptionStatus() != null) {
+            store.setSubscriptionStatus(request.getSubscriptionStatus());
+        }
+        if (request.getSubscriptionPaymentId() != null) {
+            store.setSubscriptionPaymentId(request.getSubscriptionPaymentId());
+        }
+        if (request.getSubscriptionAmount() != null) {
+            store.setSubscriptionAmount(request.getSubscriptionAmount());
         }
 
         // If previously rejected, re-enter approval queue on edit
@@ -168,6 +195,11 @@ public class StoreService {
                 .rejectionReason(store.getRejectionReason())
                 .latitude(store.getLatitude())
                 .longitude(store.getLongitude())
+                .subscriptionPlan(store.getSubscriptionPlan())
+                .subscriptionStatus(store.getSubscriptionStatus())
+                .subscriptionPaymentId(store.getSubscriptionPaymentId())
+                .subscriptionAmount(store.getSubscriptionAmount())
+                .subscriptionDate(store.getSubscriptionDate())
                 .createdAt(store.getCreatedAt())
                 .build();
     }

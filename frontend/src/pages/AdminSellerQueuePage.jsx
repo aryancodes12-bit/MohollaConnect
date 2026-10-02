@@ -11,7 +11,8 @@ import {
   RefreshCw, 
   Sparkles,
   AlertTriangle,
-  Search
+  Search,
+  CreditCard
 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -244,6 +245,31 @@ export default function AdminSellerQueuePage() {
                     <div className="flex items-center gap-2 text-[11px] text-indigo/50">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Applied on: {new Date(store.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Subscription Badge & Razorpay Payment Verification */}
+                <div className="p-3 rounded-xl bg-ivory border border-clay/15 space-y-1.5 shadow-warm-sm">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-indigo flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5 text-clay" />
+                      <span>
+                        {store.subscriptionPlan === 'HERITAGE_GUILD'
+                          ? '👑 Heritage Guild'
+                          : store.subscriptionPlan === 'STARTER'
+                          ? '🌱 Mohalla Starter'
+                          : '✨ Artisan Pro'}
+                      </span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neem/15 text-neem border border-neem/25">
+                      ₹{store.subscriptionAmount || (store.subscriptionPlan === 'HERITAGE_GUILD' ? 999 : store.subscriptionPlan === 'STARTER' ? 99 : 499)} PAID
+                    </span>
+                  </div>
+                  {store.subscriptionPaymentId && (
+                    <div className="text-[11px] font-mono text-indigo/70 truncate flex items-center gap-1.5 pt-0.5 border-t border-clay/10">
+                      <span className="text-clay font-bold shrink-0">Razorpay Ref:</span>
+                      <span className="bg-white px-2 py-0.5 rounded border border-clay/15 text-indigo font-semibold">{store.subscriptionPaymentId}</span>
                     </div>
                   )}
                 </div>

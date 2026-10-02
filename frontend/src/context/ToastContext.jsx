@@ -23,6 +23,7 @@ export function ToastProvider({ children }) {
     error: (msg) => addToast(msg, 'error'),
     info: (msg) => addToast(msg, 'info'),
     warning: (msg) => addToast(msg, 'warning'),
+    showToast: (msg, type = 'info') => addToast(msg, type),
   };
 
   return (

@@ -138,11 +138,21 @@ public class OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        if (!user.getRole().name().equals("ADMIN")) {
-            throw new BadRequestException("Only admins can view all system orders");
+        if (user.getRole().name().equals("ADMIN")) {
+            return orderRepository.findAll().stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
         }
 
-        return orderRepository.findAll().stream()
+        if (user.getRole().name().equals("SELLER") || user.getRole().name().equals("PENDING_SELLER")) {
+            return storeRepository.findByOwnerId(userId)
+                    .map(store -> orderRepository.findByProductStoreId(store.getId()).stream()
+                            .map(this::mapToResponse)
+                            .collect(Collectors.toList()))
+                    .orElse(List.of());
+        }
+
+        return orderRepository.findByBuyerId(userId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

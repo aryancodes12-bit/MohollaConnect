@@ -10,7 +10,8 @@ import {
   XCircle, 
   ArrowLeft, 
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  CreditCard
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -166,6 +167,41 @@ export default function StoreSettingsPage() {
           <p className="text-[11px] text-indigo/60">
             Saving updated store settings will automatically reset your status to <span className="font-semibold text-clay">PENDING</span> and re-enter the administrator approval queue.
           </p>
+        </div>
+      )}
+
+      {/* Active Subscription Tier Status */}
+      {store && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-warmwhite border border-clay/20 shadow-warm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-clay/10 text-clay flex items-center justify-center shrink-0">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-display text-base text-indigo font-bold">
+                  {store.subscriptionPlan === 'HERITAGE_GUILD'
+                    ? '👑 Heritage Guild'
+                    : store.subscriptionPlan === 'STARTER'
+                    ? '🌱 Mohalla Starter'
+                    : '✨ Artisan Pro'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neem/15 text-neem border border-neem/25">
+                  {store.subscriptionStatus || 'PAID'} (₹{store.subscriptionAmount || 499})
+                </span>
+              </div>
+              <p className="text-xs text-indigo/60 font-mono mt-0.5">
+                Razorpay Ref: {store.subscriptionPaymentId || 'pay_demo_activated'}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to="/pricing"
+            className="px-4 py-2 rounded-xl bg-ivory hover:bg-clay/10 text-indigo border border-clay/20 text-xs font-bold transition-all text-center shrink-0"
+          >
+            Explore Plan Benefits
+          </Link>
         </div>
       )}
 

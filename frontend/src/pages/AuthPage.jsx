@@ -14,12 +14,16 @@ import {
   EyeOff,
   MapPin,
   Tag,
-  FileText
+  FileText,
+  CreditCard,
+  Lock
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import LocationPicker from '../components/LocationPicker';
+import SellerPricingChart, { SELLER_PLANS } from '../components/pricing/SellerPricingChart';
+import { launchRazorpayCheckout } from '../utils/razorpay';
 
 const STORE_CATEGORIES = [
   { value: 'HANDICRAFTS', label: 'Handicrafts & Pottery (हस्तशिल्प)' },
@@ -37,7 +41,7 @@ export default function AuthPage() {
   
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [roleSelection, setRoleSelection] = useState(initialRole); // 'BUYER' | 'SELLER'
-  const [sellerStep, setSellerStep] = useState(1); // 1 = Account, 2 = Store Profile
+  const [sellerStep, setSellerStep] = useState(1); // 1 = Account, 2 = Store Profile, 3 = Subscription Plan & Payment
 
   // Form Fields - User
   const [name, setName] = useState('');
@@ -53,12 +57,85 @@ export default function AuthPage() {
   const [storeLatitude, setStoreLatitude] = useState(null);
   const [storeLongitude, setStoreLongitude] = useState(null);
 
+  // Subscription Plan Selection
+  const initialPlanId = searchParams.get('plan') || 'ARTISAN_PRO';
+  const initialPlan = SELLER_PLANS.find((p) => p.id === initialPlanId) || SELLER_PLANS[1];
+  const [selectedPlan, setSelectedPlan] = useState(initialPlan);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   const { login, register, loginWithGoogle } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+
+  const handleSellerSubscriptionAndRegister = async (planToUse) => {
+    const plan = planToUse || selectedPlan;
+    if (!name.trim() || !email.trim() || !password) {
+      toast.error('Please complete account credentials first');
+      setSellerStep(1);
+      return;
+    }
+    if (!storeName.trim() || !storeLocation.trim()) {
+      toast.error('Please complete workshop details first');
+      setSellerStep(2);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      toast.info(`Opening Razorpay Checkout for ${plan.name} (₹${plan.price})...`);
+      const paymentResult = await launchRazorpayCheckout({
+        plan,
+        sellerName: name.trim(),
+        sellerEmail: email.trim(),
+        storeName: storeName.trim(),
+      });
+
+      if (!paymentResult.success) {
+        toast.error('Payment was not completed. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Step A: Register the seller user account
+      const regResult = await register(name.trim(), email.trim(), password, 'SELLER');
+      if (!regResult.success) {
+        toast.error(regResult.error || 'Failed to create seller account');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Step B: Submit store application with verified subscription details
+      try {
+        await api.post('/stores', {
+          storeName: storeName.trim(),
+          category: storeCategory,
+          location: storeLocation.trim(),
+          description: storeDescription.trim() || 'Authentic handmade creations.',
+          latitude: storeLatitude,
+          longitude: storeLongitude,
+          subscriptionPlan: plan.id,
+          subscriptionPaymentId: paymentResult.paymentId,
+          subscriptionAmount: plan.price,
+          subscriptionStatus: 'PAID',
+        });
+        toast.success(
+          `Demo subscription of ₹${plan.price} verified (Ref: ${paymentResult.paymentId})! Store application sent to Admin Queue.`
+        );
+      } catch (storeErr) {
+        console.warn('Store creation notice:', storeErr);
+        toast.warning('Account created! Your store application is being processed.');
+      }
+
+      navigate('/dashboard');
+    } catch (err) {
+      console.warn('Payment dismiss / error:', err);
+      toast.warning(err.message || 'Payment cancelled. A subscription is required before your store reaches Admin.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleGoogleAuth = async () => {
     if (isGoogleSubmitting || isSubmitting) return;
@@ -165,7 +242,7 @@ export default function AuthPage() {
         return;
       }
 
-      // Step 2 validation for Seller
+      // Step 2 validation for Seller: advance to Step 3
       if (roleSelection === 'SELLER' && sellerStep === 2) {
         if (!storeName.trim()) {
           toast.error('Please provide your Store / Workshop name');
@@ -175,33 +252,23 @@ export default function AuthPage() {
           toast.error('Please specify your Mohalla / Locality address');
           return;
         }
+        // Advance to Step 3 (Subscription Plan & Razorpay Test Payment)
+        setSellerStep(3);
+        return;
+      }
+
+      // Step 3 for Seller: Trigger Razorpay test payment and complete onboarding
+      if (roleSelection === 'SELLER' && sellerStep === 3) {
+        handleSellerSubscriptionAndRegister(selectedPlan);
+        return;
       }
 
       setIsSubmitting(true);
       try {
         const result = await register(name, email, password, roleSelection);
         if (result.success) {
-          if (roleSelection === 'SELLER') {
-            // Automatically create the store with the newly acquired credentials
-            try {
-              await api.post('/stores', {
-                storeName: storeName.trim(),
-                category: storeCategory,
-                location: storeLocation.trim(),
-                description: storeDescription.trim() || 'Authentic handmade creations.',
-                latitude: storeLatitude,
-                longitude: storeLongitude,
-              });
-              toast.success('Store application submitted! Awaiting Mohalla Admin approval.');
-            } catch (storeErr) {
-              console.warn('Auto store creation notice:', storeErr);
-              toast.warning('Account created! You can finish setting up your store in the dashboard.');
-            }
-            navigate('/dashboard');
-          } else {
-            toast.success('Account created successfully! Welcome to LocalConnect.');
-            navigate('/');
-          }
+          toast.success('Account created successfully! Welcome to LocalConnect.');
+          navigate('/');
         } else {
           toast.error(result.error || 'Registration failed');
         }
@@ -294,6 +361,8 @@ export default function AuthPage() {
               <h1 className="font-display text-2xl md:text-3xl text-indigo">
                 {mode === 'login'
                   ? 'Welcome Back'
+                  : roleSelection === 'SELLER' && sellerStep === 3
+                  ? 'Mohalla Seller Subscription'
                   : roleSelection === 'SELLER' && sellerStep === 2
                   ? 'Store Profile Setup'
                   : 'Join LocalConnect'}
@@ -301,8 +370,10 @@ export default function AuthPage() {
               <p className="text-xs sm:text-sm text-indigo/70 mt-0.5">
                 {mode === 'login'
                   ? 'Access your orders, OTP verifications, and saved stores.'
+                  : roleSelection === 'SELLER' && sellerStep === 3
+                  ? 'Step 3 of 3: Choose subscription tier and complete Razorpay test payment.'
                   : roleSelection === 'SELLER' && sellerStep === 2
-                  ? 'Step 2 of 2: Tell buyers about your craft & workshop location.'
+                  ? 'Step 2 of 3: Tell buyers about your craft & workshop location.'
                   : 'Create an account to support local artisans or start selling.'}
               </p>
             </div>
@@ -548,13 +619,40 @@ export default function AuthPage() {
               </motion.div>
             )}
 
+            {/* Form Fields: Step 3 (Seller Subscription & Razorpay Test Checkout) */}
+            {mode === 'register' && roleSelection === 'SELLER' && sellerStep === 3 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-4"
+              >
+                <div className="p-3.5 rounded-2xl bg-clay/5 border border-clay/20 flex items-start gap-3 text-xs text-indigo">
+                  <Sparkles className="w-4 h-4 text-clay shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-bold">Required Demo Step Before Admin Approval</span>
+                    <p className="text-[11px] text-indigo/70 leading-relaxed">
+                      Sellers must select a subscription tier and complete a simulated Razorpay test payment. Once verified, your application is immediately submitted to the Mohalla Admin Approval Queue!
+                    </p>
+                  </div>
+                </div>
+
+                <SellerPricingChart
+                  selectedPlanId={selectedPlan.id}
+                  onSelectPlan={(plan) => setSelectedPlan(plan)}
+                  onProceedPayment={(plan) => handleSellerSubscriptionAndRegister(plan)}
+                  isProcessing={isSubmitting}
+                  showActionButtons={false}
+                />
+              </motion.div>
+            )}
+
             {/* Action Buttons */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3">
-                {mode === 'register' && roleSelection === 'SELLER' && sellerStep === 2 && (
+                {mode === 'register' && roleSelection === 'SELLER' && sellerStep > 1 && (
                   <button
                     type="button"
-                    onClick={() => setSellerStep(1)}
+                    onClick={() => setSellerStep(sellerStep - 1)}
                     className="px-4 py-3 rounded-xl bg-ivory hover:bg-clay/10 text-indigo border border-clay/20 text-xs font-bold transition-all flex items-center gap-1.5"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
@@ -580,8 +678,13 @@ export default function AuthPage() {
                     </>
                   ) : roleSelection === 'SELLER' && sellerStep === 2 ? (
                     <>
-                      <span>Submit Store Application</span>
+                      <span>Continue to Subscription Plan</span>
                       <ArrowRight className="w-4 h-4" />
+                    </>
+                  ) : roleSelection === 'SELLER' && sellerStep === 3 ? (
+                    <>
+                      <CreditCard className="w-4 h-4" />
+                      <span>Pay ₹{selectedPlan.price} with Razorpay & Submit</span>
                     </>
                   ) : (
                     <>

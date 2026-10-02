@@ -44,6 +44,21 @@ public class Store {
     @Column(name = "longitude")
     private Double longitude;
 
+    @Column(name = "subscription_plan")
+    private String subscriptionPlan;
+
+    @Column(name = "subscription_status")
+    private String subscriptionStatus;
+
+    @Column(name = "subscription_payment_id")
+    private String subscriptionPaymentId;
+
+    @Column(name = "subscription_amount")
+    private Double subscriptionAmount;
+
+    @Column(name = "subscription_date")
+    private java.time.LocalDateTime subscriptionDate;
+
     @Column(name = "created_at")
     private java.time.LocalDateTime createdAt;
 

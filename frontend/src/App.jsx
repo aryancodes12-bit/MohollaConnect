@@ -25,6 +25,7 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
 import SellerAnalyticsPage from './pages/SellerAnalyticsPage';
 import MarketplaceBIDashboardPage from './pages/MarketplaceBIDashboardPage';
+import PricingPage from './pages/PricingPage';
 import DesignTokens from './pages/DesignTokens';
 
 // Components
@@ -60,6 +61,7 @@ export default function App() {
                       <Route path="/" element={<HomeRoute />} />
                       <Route path="/login" element={<AuthPage />} />
                       <Route path="/register" element={<AuthPage />} />
+                      <Route path="/pricing" element={<PricingPage />} />
                       <Route path="/bazaar-map" element={<BazaarMapPage />} />
                       
                       {/* Public Marketplace Views */}
